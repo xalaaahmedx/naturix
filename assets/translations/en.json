@@ -1,0 +1,59 @@
+{
+  "on_boarding_title_1": "Digital Catalog",
+  "on_boarding_title_2": "Home Stories",
+  "on_boarding_title_3": "Simplified Management",
+
+  "on_boarding_description_1": "Effortlessly organize and document your furniture pieces with this user-friendly digital catalog.",
+  "on_boarding_description_2": "Capture and share the unique stories behind your furniture, turning them into cherished elements of your home's narrative.",
+  "on_boarding_description_3": "Streamline the management of your furniture pieces with this intuitive app, ensuring easy tracking and documentation.",
+
+  "next": "Next",
+  "skip": "Skip",
+
+  "auth_method_title": "Welcome",
+  "auth_method_description": "choose between secure login or quick registration to tailor your access.",
+
+  "login": "Login",
+  "register": "Register",
+  "google": "Google",
+
+  "login_description": "Unlock Your World: Sign In for a Personalized Experience",
+  "register_description": "Embark on Your Journey: Register for Exclusive Access",
+
+  "email": "Email",
+  "password": "Password",
+  "phone_number": "Phone number",
+  "username": "Username",
+
+  "email_hint": "Enter your email",
+  "password_hint": "Enter your password",
+  "phone_number_hint": "Enter your phone number",
+  "username_hint": "Enter your username",
+
+  "remember_me": "Remember me",
+  "forgot_password": "Forgot password?",
+
+  "dont_have_account": "don't have an account?",
+
+  "already_have_account": "Already have an account?",
+
+  "done": "Done",
+  "all_done": "All Done",
+  "all_done_description": "We have sent you an email, check your inbox",
+
+  "have_no_products": "You have no products",
+  "have_no_products_description": "Try adding some products and it will appear in this page from the plus icon below",
+
+  "add": "Add",
+  "add_product": "Add Product",
+  "home": "Home",
+
+  "who_am_i": "Who am I?",
+  "person": "Person",
+  "organization": "Organization",
+  "restaurant": "Restaurant",
+
+  "reset_password": "Reset password",
+  "reset_password_sub_text": "Please enter your email, an email will be sent to your inbox"
+
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970704007603",
+    "project_id": "naturix-e6bf7",
+    "storage_bucket": "naturix-e6bf7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970704007603:android:61c70fe29aa6d59a82dbc6",
+        "android_client_info": {
+          "package_name": "com.example.naturix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnAn63GlwVWYzhAzYObLQPfjmi_hP1SEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,59 @@
+{
+  "on_boarding_title_1": "فهرس رقمي",
+  "on_boarding_title_2": "قصص المنزل",
+  "on_boarding_title_3": "إدارة مبسّطة",
+
+  "on_boarding_description_1": "الوصف: نظم ووثق أثاثك بسهولة مع هذا الفهرس الرقمي السهل الاستخدام",
+  "on_boarding_description_2": "الوصف: التقط وشارك القصص الفريدة وراء أثاثك، محولًا إياها إلى عناصر تحبس الأنفاس في رواية منزلك.",
+  "on_boarding_description_3": "الوصف: بسّط إدارة قطع الأثاث مع هذا التطبيق البديهي، مما يضمن تتبعًا وثائقًا سهلين.",
+
+  "next": "التالي",
+  "skip": "تخطي",
+
+  "auth_method_title": "اهلا بك",
+  "auth_method_description": "اختر بين تسجيل الدخول الآمن أو التسجيل السريع لتخصيص وصولك.",
+
+  "login": "تسجيل الدخول",
+  "register": "انشاء حساب",
+  "google": "جوجل",
+
+  "login_description": "قم بتسجيل الدخول لتجربة فريدة وشخصية",
+  "register_description": "سجّل للوصول إلى تجربة حصرية",
+
+  "email": "البريد الالكتروني",
+  "password": "الرقم السري",
+  "phone_number": "رقم الهاتف",
+  "username": "اسم المستخدم",
+
+  "email_hint": "ادخل البريد الاكتروني",
+  "password_hint": "ادخل كلمه المرور الخاصه بك",
+  "phone_number_hint": "ادخل رقم الهاف الخاصه بك",
+  "username_hint": "ادخل اسم المستخدم الخاصه بك",
+
+  "remember_me": "تذكرني",
+  "forgot_password": "نسيت كلمه المرور؟",
+
+  "dont_have_account": "ليس لديك حساب",
+
+  "already_have_account": "لديك حساب بالفعل",
+
+  "done": "تم",
+  "all_done": "كل شسء تم",
+  "all_done_description": "لقد ارسلنا لك رساله بريديه تحقق منها لتاكيد حساب",
+
+  "have_no_products": "ليس لديك منتجات",
+  "have_no_products_description": "جرب إضافة بعض المنتجات وستظهر في هذه الصفحة من خلال الرمز زائد أدناه",
+
+  "add": "اضف",
+  "add_product": "اضف منتج",
+  "home": "الرئيسيه",
+
+  "who_am_i": "من انا؟",
+  "person": "شخص",
+  "organization": "مؤسسه",
+  "restaurant": "مطعم",
+
+  "reset_password": "تغيير كلمه المرور",
+  "reset_password_sub_text": "من فضلك ادخل البريد الخاص بك و ستصلك رساله قريبا"
+
+}
