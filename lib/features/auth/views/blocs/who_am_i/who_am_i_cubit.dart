@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:naturix/core/di/app_module.dart';
 import 'package:naturix/features/auth/domain/usecases/select_who_am_i_use_case.dart';
+import 'package:naturix/screens/first_onboardingscreen.dart';
 
 import '../../../../../core/config/app_consts.dart';
 import '../../../../../core/errors/failure.dart';
@@ -14,69 +16,65 @@ class WhoAmICubit extends Cubit<WhoAmIState> {
 
   int whoAmIIndex = 0;
 
-  onPersonSelected(value){
+  onPersonSelected(value) {
     emit(WhoAmIValueChanged());
     whoAmIIndex = value;
     emit(WhoAmIInitial());
   }
 
-  onOrganizationSelected(value){
+  onOrganizationSelected(value) {
     emit(WhoAmIValueChanged());
     whoAmIIndex = value;
     emit(WhoAmIInitial());
   }
 
-  onRestaurantSelected(value){
+  onRestaurantSelected(value) {
     emit(WhoAmIValueChanged());
     whoAmIIndex = value;
     emit(WhoAmIInitial());
   }
 
-  String whoAmI(int value){
-    switch(value){
-      case 1 :
+  String whoAmI(int value) {
+    switch (value) {
+      case 1:
         return AppConsts.person;
 
-      case 2 :
+      case 2:
         return AppConsts.organization;
 
-      case 3 :
+      case 3:
         return AppConsts.restaurant;
 
       default:
         return AppConsts.person;
-
     }
   }
 
-  onDoneClick(BuildContext context){
+  onDoneClick(BuildContext context) {
     selectWhoAmI(context);
   }
 
-  selectWhoAmI(BuildContext context){
+  selectWhoAmI(BuildContext context) {
     emit(WhoAmILoading());
-    getIt<SelectWhoAmIUseCase>().call(whoAmI(whoAmIIndex))
-    .then((value) => value.fold(
-      (error) {
-        emit(WhoAmIError(error));
-        showFlushBar(
-            context,
-            title: "Error ${error.failureCode}",
-            message : error.message
-        );
-        emit(WhoAmIInitial());
-      },
-      (success) {
-        emit(WhoAmISuccess());
-        navigateToHomeScreen(context);
-        emit(WhoAmIInitial());
-
-      })
-    );
+    getIt<SelectWhoAmIUseCase>()
+        .call(whoAmI(whoAmIIndex))
+        .then((value) => value.fold((error) {
+              emit(WhoAmIError(error));
+              showFlushBar(context,
+                  title: "Error ${error.failureCode}", message: error.message);
+              emit(WhoAmIInitial());
+            }, (success) {
+              emit(WhoAmISuccess());
+              navigateToHomeScreen(context);
+              emit(WhoAmIInitial());
+            }));
   }
 
-  navigateToHomeScreen(BuildContext context){
+  navigateToHomeScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => OnBoardingScreens()),
+    );
     //
   }
-
 }

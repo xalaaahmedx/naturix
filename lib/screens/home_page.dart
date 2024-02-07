@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:naturix/widgets/addpostwidget.dart';
 
 import 'package:naturix/widgets/maindrawe.dart';
 
@@ -107,7 +108,19 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                 ],
               ),
-              body: Column(
+              body: CustomScrollView(
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return AddPostWidget();
+                      },
+                      childCount: 5,
+                    ),
+                  ),
+                ],
+              ),
+              /*Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -149,7 +162,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     ),
                   ),
                 ],
-              ),
+              ),*/
             ),
           ),
         ],

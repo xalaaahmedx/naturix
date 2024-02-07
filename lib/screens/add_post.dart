@@ -41,12 +41,6 @@ class _AddPostState extends State<AddPost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Post'),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.grey[100],
-      ),
       backgroundColor: Colors.grey[100]!,
       body: SafeArea(
           child: Stack(

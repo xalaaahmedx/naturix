@@ -51,7 +51,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
         controller: pageController,
         onPageChanged: onPageChanged,
         children: const [
-          HomeScreen(),
+          HomePageScreen(),
           Search(),
           AddPost(),
           Likes(),
