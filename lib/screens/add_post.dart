@@ -41,7 +41,7 @@ class _AddPostState extends State<AddPost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100]!,
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
           child: Stack(
         alignment: Alignment.bottomCenter,

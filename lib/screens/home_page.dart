@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/widgets/addpostwidget.dart';
 
@@ -12,6 +14,8 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   double value = 0;
   int currentIndex = 0;
   late PageController _pageController;
@@ -38,6 +42,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100]!,
       body: Stack(
         children: [
           Container(
@@ -69,7 +74,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ..rotateY((pi / 6) * value),
             child: Scaffold(
               extendBody: true,
-              backgroundColor: Colors.grey[100]!,
+              backgroundColor: Colors.grey[100],
               appBar: AppBar(
                 elevation: 0,
                 title: const Text(
@@ -110,14 +115,29 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ),
               body: CustomScrollView(
                 slivers: [
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        return AddPostWidget();
-                      },
-                      childCount: 5,
-                    ),
-                  ),
+                  StreamBuilder(
+                    stream: _firebaseFirestore
+                        .collection('posts')
+                        .orderBy('time', descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (snapshot.hasData) {
+                              return AddPostWidget(
+                                  snapshot.data!.docs[index].data());
+                            }
+
+                            return Center(child: CircularProgressIndicator());
+                          },
+                          childCount: snapshot.data == null
+                              ? 0
+                              : snapshot.data!.docs.length,
+                        ),
+                      );
+                    },
+                  )
                 ],
               ),
               /*Column(

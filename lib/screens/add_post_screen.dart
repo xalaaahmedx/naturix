@@ -30,7 +30,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100]!,
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -52,7 +52,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => AddPostTextScreen(
-                        selectedImages[selectedImageIndex],),
+                        selectedImages[selectedImageIndex],
+                      ),
                     ),
                   );
                 },

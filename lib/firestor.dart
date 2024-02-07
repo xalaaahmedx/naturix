@@ -66,6 +66,7 @@ class Firebase_FireStor {
     required String postImage,
     required String caption,
     required String location,
+    required String username,
   }) async {
     var uid = Uuid().v4();
     UserModels user = await getUser();

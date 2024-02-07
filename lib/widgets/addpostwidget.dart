@@ -1,14 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/widgets/image.dart';
 import 'package:sizer/sizer.dart';
 
-class AddPostWidget extends StatefulWidget {
-  const AddPostWidget({Key? key}) : super(key: key);
+class AddPostWidget extends StatelessWidget {
+  final snapShot;
 
-  @override
-  State<AddPostWidget> createState() => _AddPostWidgetState();
-}
+  const AddPostWidget(this.snapShot, {super.key});
 
-class _AddPostWidgetState extends State<AddPostWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,19 +20,20 @@ class _AddPostWidgetState extends State<AddPostWidget> {
             child: ListTile(
               leading: ClipOval(
                 child: SizedBox(
-                  width: 35,
-                  height: 35,
-                  child: Image.asset('assets/images/bear.png'),
-                ),
+                    width: 35,
+                    height: 35,
+                    child: CachedImage(
+                      snapShot['profileImage'] ?? '',
+                    )),
               ),
               title: Text(
-                'username',
+                snapShot['username']!,
                 style: TextStyle(
                   fontSize: 13.sp,
                 ),
               ),
               subtitle: Text(
-                'location',
+                snapShot['location']!,
                 style: TextStyle(
                   fontSize: 11.sp,
                 ),
@@ -51,10 +51,9 @@ class _AddPostWidgetState extends State<AddPostWidget> {
           width: 375,
           height: 375,
           color: Colors.grey[100]!,
-          child: Image.asset(
-            'assets/images/plant-three.png',
-            fit: BoxFit.fitHeight,
-          ),
+          child: CachedImage(
+            snapShot['postImage'] ?? '',
+          )
         ),
         // Row containing favorite icon and "0" UI element
         Container(
@@ -90,15 +89,19 @@ class _AddPostWidgetState extends State<AddPostWidget> {
             ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.only(left: 15, top: 8),
-          child: Text(
-            '0',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 15, top: 8),
+              child: Text(
+                snapShot['likes'].length.toString() + ' likes',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
 
         Padding(
@@ -112,7 +115,7 @@ class _AddPostWidgetState extends State<AddPostWidget> {
               SizedBox(
                 width: 5,
               ),
-              Text('caption',
+              Text(snapShot['caption']! + '',
                   style: TextStyle(
                     fontSize: 13,
                   )),
@@ -122,7 +125,7 @@ class _AddPostWidgetState extends State<AddPostWidget> {
         Padding(
           padding: const EdgeInsets.only(left: 15, top: 20, bottom: 8),
           child: Text(
-            'dateformat',
+            '',
             style: TextStyle(fontSize: 11, color: Colors.grey),
           ),
         )

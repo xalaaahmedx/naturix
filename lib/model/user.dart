@@ -16,4 +16,3 @@ class UserModels {
     // Add other parameters if needed
   });
 }
-

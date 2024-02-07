@@ -2,7 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/chat.dart';
 import 'package:naturix/screens/home_page.dart';
-import 'package:naturix/screens/homescreen.dart';
+
 import 'package:naturix/screens/likes.dart';
 import 'package:naturix/screens/search.dart';
 import 'package:naturix/screens/add_post.dart';
