@@ -69,7 +69,7 @@ class _MainDrawerState extends State<MainDrawer>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const MyProfile()),
+                          builder: (context) =>  MyProfile()),
                     );
                   },
                 ),
