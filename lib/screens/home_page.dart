@@ -117,27 +117,35 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 slivers: [
                   StreamBuilder(
                     stream: _firebaseFirestore
+                        .collection('users')
+                        .doc(_auth.currentUser!.uid)
                         .collection('posts')
                         .orderBy('time', descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(child: Text('No posts available.'));
+                      }
+
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            if (snapshot.hasData) {
-                              return AddPostWidget(
-                                  snapshot.data!.docs[index].data());
-                            }
-
-                            return Center(child: CircularProgressIndicator());
+                            return AddPostWidget(
+                                snapshot.data!.docs[index].data());
                           },
-                          childCount: snapshot.data == null
-                              ? 0
-                              : snapshot.data!.docs.length,
+                          childCount: snapshot.data!.docs.length,
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               ),
               /*Column(

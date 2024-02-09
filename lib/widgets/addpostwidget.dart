@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/services/firebase_service.dart';
 import 'package:naturix/widgets/image.dart';
 import 'package:sizer/sizer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddPostWidget extends StatelessWidget {
-  final snapShot;
+  final snapshot;
 
-  const AddPostWidget(this.snapShot, {super.key});
+  const AddPostWidget(this.snapshot, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +22,44 @@ class AddPostWidget extends StatelessWidget {
             child: ListTile(
               leading: ClipOval(
                 child: SizedBox(
-                    width: 35,
-                    height: 35,
-                    child: CachedImage(
-                      snapShot['profileImage'] ?? '',
-                    )),
-              ),
-              title: Text(
-                snapShot['username']!,
-                style: TextStyle(
-                  fontSize: 13.sp,
+                  width: 35,
+                  height: 35,
+                  child: CachedImage(
+                    snapshot['profileImage'] ?? '',
+                  ),
                 ),
               ),
+              title: FutureBuilder(
+                future: getUserData(snapshot['username']),
+                builder: (context, usernameSnapshot) {
+                  if (snapshot['username'] == null) {
+                    return Text('Unknown');
+                  }
+
+                  if (usernameSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+
+                  if (usernameSnapshot.hasError) {
+                    return Text('Error: ${usernameSnapshot.error}');
+                  }
+
+                  final usernameData = usernameSnapshot.data;
+                  if (usernameData is String) {
+                    return Text(
+                      usernameData,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                      ),
+                    );
+                  } else {
+                    return Text('Unknown');
+                  }
+                },
+              ),
               subtitle: Text(
-                snapShot['location']!,
+                snapshot['location']!,
                 style: TextStyle(
                   fontSize: 11.sp,
                 ),
@@ -52,10 +78,9 @@ class AddPostWidget extends StatelessWidget {
           height: 375,
           color: Colors.grey[100]!,
           child: CachedImage(
-            snapShot['postImage'] ?? '',
-          )
+            snapshot['postImage'] ?? '',
+          ),
         ),
-        // Row containing favorite icon and "0" UI element
         Container(
           width: 375,
           height: 54,
@@ -94,7 +119,7 @@ class AddPostWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 15, top: 8),
               child: Text(
-                snapShot['likes'].length.toString() + ' likes',
+                snapshot['likes'].length.toString() + ' likes',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -103,22 +128,50 @@ class AddPostWidget extends StatelessWidget {
             ),
           ],
         ),
-
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 15,
           ),
           child: Row(
             children: [
-              Text('username' + '',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              FutureBuilder(
+                future: getUserData(snapshot['username']),
+                builder: (context, usernameSnapshot) {
+                  if (snapshot['username'] == null) {
+                    return Text('Unknown');
+                  }
+
+                  if (usernameSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+
+                  if (usernameSnapshot.hasError) {
+                    return Text('Error: ${usernameSnapshot.error}');
+                  }
+
+                  final usernameData = usernameSnapshot.data;
+                  if (usernameData is String) {
+                    return Text(
+                      usernameData,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                      ),
+                    );
+                  } else {
+                    return Text('Unknown');
+                  }
+                },
+              ),
               SizedBox(
                 width: 5,
               ),
-              Text(snapShot['caption']! + '',
-                  style: TextStyle(
-                    fontSize: 13,
-                  )),
+              Text(
+                snapshot['caption']! + '',
+                style: TextStyle(
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
         ),
@@ -128,7 +181,7 @@ class AddPostWidget extends StatelessWidget {
             '',
             style: TextStyle(fontSize: 11, color: Colors.grey),
           ),
-        )
+        ),
       ],
     );
   }
