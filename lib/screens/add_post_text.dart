@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:naturix/services/storage.dart';
+import 'package:naturix/firestor.dart';
+
+import 'package:naturix/storage.dart';
 import 'package:sizer/sizer.dart';
-import 'package:naturix/services/firestor.dart';
 
 class AddPostTextScreen extends StatefulWidget {
   File? _file;

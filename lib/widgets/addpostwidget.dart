@@ -1,14 +1,45 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/features/auth/domain/usecases/get_user_use_case.dart';
 import 'package:naturix/services/firebase_service.dart';
 import 'package:naturix/widgets/image.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AddPostWidget extends StatelessWidget {
+class AddPostWidget extends StatefulWidget {
   final snapshot;
 
   const AddPostWidget(this.snapshot, {Key? key}) : super(key: key);
+
+  @override
+  State<AddPostWidget> createState() => _AddPostWidgetState();
+}
+
+class _AddPostWidgetState extends State<AddPostWidget> {
+  String? username;
+  @override
+  void initState() {
+    super.initState();
+    fetchUsername();
+  }
+
+  void fetchUsername() async {
+    final getUserUseCase = GetUserUseCase();
+
+    final result = await getUserUseCase.call();
+
+    result.fold(
+      (failure) {
+        print('Failed to fetch username: $failure');
+      },
+      (user) {
+        setState(() {
+          username = user?.name;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,41 +56,13 @@ class AddPostWidget extends StatelessWidget {
                   width: 35,
                   height: 35,
                   child: CachedImage(
-                    snapshot['profileImage'] ?? '',
+                    widget.snapshot['profileImage'] ?? '',
                   ),
                 ),
               ),
-              title: FutureBuilder(
-                future: getUserData(snapshot['username']),
-                builder: (context, usernameSnapshot) {
-                  if (snapshot['username'] == null) {
-                    return Text('Unknown');
-                  }
-
-                  if (usernameSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (usernameSnapshot.hasError) {
-                    return Text('Error: ${usernameSnapshot.error}');
-                  }
-
-                  final usernameData = usernameSnapshot.data;
-                  if (usernameData is String) {
-                    return Text(
-                      usernameData,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                      ),
-                    );
-                  } else {
-                    return Text('Unknown');
-                  }
-                },
-              ),
+              title: Text(username ?? ''),
               subtitle: Text(
-                snapshot['location']!,
+                widget.snapshot['location']!,
                 style: TextStyle(
                   fontSize: 11.sp,
                 ),
@@ -78,7 +81,7 @@ class AddPostWidget extends StatelessWidget {
           height: 375,
           color: Colors.grey[100]!,
           child: CachedImage(
-            snapshot['postImage'] ?? '',
+            widget.snapshot['postImage'] ?? '',
           ),
         ),
         Container(
@@ -91,9 +94,8 @@ class AddPostWidget extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border),
-                  ),
+                      onPressed: () {},
+                      icon: const Icon(Icons.favorite, color: Colors.red)),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.mode_comment_outlined),
@@ -119,7 +121,7 @@ class AddPostWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 15, top: 8),
               child: Text(
-                snapshot['likes'].length.toString() + ' likes',
+                widget.snapshot['likes'].length.toString() + ' likes',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -134,40 +136,12 @@ class AddPostWidget extends StatelessWidget {
           ),
           child: Row(
             children: [
-              FutureBuilder(
-                future: getUserData(snapshot['username']),
-                builder: (context, usernameSnapshot) {
-                  if (snapshot['username'] == null) {
-                    return Text('Unknown');
-                  }
-
-                  if (usernameSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (usernameSnapshot.hasError) {
-                    return Text('Error: ${usernameSnapshot.error}');
-                  }
-
-                  final usernameData = usernameSnapshot.data;
-                  if (usernameData is String) {
-                    return Text(
-                      usernameData,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                      ),
-                    );
-                  } else {
-                    return Text('Unknown');
-                  }
-                },
-              ),
+              Text(username ?? ''),
               SizedBox(
                 width: 5,
               ),
               Text(
-                snapshot['caption']! + '',
+                widget.snapshot['caption']! + '',
                 style: TextStyle(
                   fontSize: 13,
                 ),

@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naturix/services/firestor.dart';
+import 'package:naturix/firestor.dart';
+
 import 'package:naturix/model/user.dart';
 import 'package:naturix/widgets/image.dart';
 import 'package:sizer/sizer.dart';
@@ -38,19 +39,24 @@ class MyProfile extends StatelessWidget {
                 child: FutureBuilder(
                   future: Firebase_FireStor().getUser(),
                   builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+
                     if (!snapshot.hasData) {
-                      return const Center(
+                      return Center(
                         child: CircularProgressIndicator(),
                       );
                     }
+
                     return Head(snapshot.data!);
                   },
                 ),
               ),
               StreamBuilder(
                 stream: _firebaseFirestore
-                    .collection('users')
-                    .doc(_auth.currentUser!.uid)
                     .collection('posts')
                     .orderBy('time', descending: true)
                     .snapshots(),
@@ -139,7 +145,6 @@ class MyProfile extends StatelessWidget {
                       width: 22.w,
                     ),
                     Text(
-
                       //user.following.length.toString(),
                       '10',
                       style: TextStyle(

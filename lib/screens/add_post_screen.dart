@@ -14,10 +14,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
   List<File> selectedImages = [];
   int selectedImageIndex = 0;
 
-  Future<void> _fetchNewMedia() async {
+  Future<void> _fetchNewMedia(ImageSource source) async {
     final imagePicker = ImagePicker();
-    XFile? pickedFile =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+    XFile? pickedFile = await imagePicker.pickImage(source: source);
 
     if (pickedFile != null) {
       selectedImages.add(File(pickedFile.path));
@@ -63,45 +62,54 @@ class _AddPostScreenState extends State<AddPostScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 375,
-                child: selectedImages.isNotEmpty
-                    ? buildImageWidget(selectedImages[selectedImageIndex])
-                    : Container(),
-              ),
-              Container(
-                width: double.infinity,
-                height: 48,
-                color: Colors.grey[100],
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 10,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 375,
+              child: selectedImages.isNotEmpty
+                  ? buildImageWidget(selectedImages[selectedImageIndex])
+                  : Container(),
+            ),
+            Container(
+              width: double.infinity,
+              height: 48,
+              color: Colors.grey[100],
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Recent',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Text(
-                      'Recent',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      _fetchNewMedia(ImageSource.gallery);
+                    },
+                    child: Text(
+                      'Gallery',
+                      style: TextStyle(color: Colors.white),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      _fetchNewMedia(ImageSource.camera);
+                    },
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  _fetchNewMedia();
-                },
-                child: Text(
-                  'Open Image Picker',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -109,17 +117,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   Widget buildImageWidget(File imageFile) {
     return Container(
-      width: 200,
+      width: double.infinity,
       height: 200,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.file(
-              imageFile,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
+      child: Image.file(
+        imageFile,
+        fit: BoxFit.cover,
       ),
     );
   }
