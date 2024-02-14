@@ -15,7 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naturix/screens/first_onboardingscreen.dart';
 
 final colorScheme = ColorScheme.fromSeed(
-  seedColor: const Color.fromARGB(255, 2, 165, 146),
+  seedColor: Color.fromARGB(255, 138, 255, 241),
   background: const Color.fromARGB(255, 250, 250, 250),
 );
 
@@ -40,11 +40,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
- runApp(
+  runApp(
     ChangeNotifierProvider(
         create: (context) => AuthService(), child: const MyApp()),
   );
- 
 }
 
 class MyApp extends StatelessWidget {

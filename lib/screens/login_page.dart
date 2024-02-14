@@ -69,7 +69,9 @@ class _LoginPageState extends State<LoginPage> {
                   MyTextField(
                       controller: _passwordController,
                       obscureText: true,
-                      hintText: 'Enter Password'),
+                      hintText: 'Enter Password'
+                     
+                      ),
                   const SizedBox(
                     height: 25,
                   ),
