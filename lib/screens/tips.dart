@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/chat.dart';
 import 'package:naturix/screens/home_page.dart';
-import 'package:naturix/screens/add_post.dart';
+
 
 import 'package:naturix/widgets/tipcard.dart';
 import 'package:naturix/widgets/tips_card.dart';

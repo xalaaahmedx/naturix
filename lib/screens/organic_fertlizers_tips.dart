@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/chat.dart';
 import 'package:naturix/screens/home_page.dart';
-import 'package:naturix/screens/add_post.dart';
+
 
 import 'package:naturix/widgets/tipcard.dart';
 import 'package:naturix/widgets/tips_card.dart';
@@ -216,28 +216,5 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
     );
   }
 
-  void _navigateToScreen(int index) {
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePageScreen()),
-        );
-        break;
-      case 1:
-        // Navigate to AddPostScreen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AddPost()),
-        );
-        break;
-      case 2:
-        // Navigate to ChatScreen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Chat()),
-        );
-        break;
-    }
-  }
+ 
 }

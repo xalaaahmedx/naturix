@@ -1,16 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
-import 'package:naturix/features/auth/domain/model/user_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:naturix/model/user.dart';
 
-class Firebase_FireStor {
+class FirebaseFireStor {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<bool> CreateUser({
+  Future<bool> createUser({
     required String email,
     required String username,
     required String bio,
@@ -32,25 +31,17 @@ class Firebase_FireStor {
 
   Future<UserModels> getUser() async {
     try {
-      final user = await _firebaseFirestore
+      final userDoc = await _firebaseFirestore
           .collection('users')
           .doc(_auth.currentUser!.uid)
           .get();
 
-      if (user.exists) {
-        final snapUser = user.data();
-        print('snapUser: $snapUser');
+      if (userDoc.exists) {
+        final userData = userDoc.data();
+        print('userData: $userData');
 
-        if (snapUser != null) {
-          return UserModels(
-            whoAmI: snapUser['whoAmI'] ?? '', // Use the null-aware operator
-            email: snapUser['email'] ?? '',
-            username: snapUser['username'] ?? '',
-            profile: snapUser['profile'] ?? '',
-            followers: List<String>.from(snapUser['followers'] ?? []),
-            following: List<String>.from(snapUser['following'] ?? []),
-            // Add other parameters if needed
-          );
+        if (userData != null) {
+          return UserModels.fromMap(userData);
         } else {
           throw Exception('User data is incomplete or null.');
         }
@@ -62,7 +53,7 @@ class Firebase_FireStor {
     }
   }
 
-  Future<bool> CreatePost({
+  Future<bool> createPost({
     required String postImage,
     required String caption,
     required String location,

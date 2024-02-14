@@ -1,273 +1,183 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naturix/firestor.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:naturix/helper/helper_methods.dart';
+import 'package:naturix/widgets/addpostwidget.dart';
+import 'package:naturix/widgets/widgetss/text_box.dart';
 
-import 'package:naturix/model/user.dart';
-import 'package:naturix/widgets/image.dart';
-import 'package:sizer/sizer.dart';
+class MyProfile extends StatefulWidget {
+  const MyProfile({Key? key}) : super(key: key);
 
-class MyProfile extends StatelessWidget {
-  MyProfile({Key? key});
-  bool isEditingBio = false;
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
 
-  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+class _MyProfileState extends State<MyProfile> {
+  final currentUser = FirebaseAuth.instance.currentUser;
+  final userCollection = FirebaseFirestore.instance.collection('users');
+  final userPostsCollection =
+      FirebaseFirestore.instance.collection('user posts');
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<void> editField(String field) async {
+    final controller = TextEditingController();
+
+    print('Opening dialog for $field editing...');
+
+    try {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          print('Dialog builder for $field');
+          return Dialog(
+            backgroundColor: Colors.grey[900],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Edit $field',
+                      style: const TextStyle(color: Colors.white)),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'Enter new $field',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(controller.text);
+                        },
+                        child: const Text('Save',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      print('Dialog closed for $field');
+    } catch (e) {
+      print('Error in showDialog: $e');
+    }
+
+    final newValue = controller.text;
+
+    if (newValue.isNotEmpty) {
+      await userCollection.doc(currentUser?.email).update({field: newValue});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 1,
-      child: Scaffold(
-        backgroundColor: Colors.grey[100],
-        appBar: AppBar(
-          backgroundColor: Colors.grey[100],
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-          title: const Text('My Profile'),
-        ),
-        body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: FutureBuilder(
-                  future: Firebase_FireStor().getUser(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    }
-
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-
-                    return Head(snapshot.data!);
-                  },
-                ),
-              ),
-              StreamBuilder(
-                stream: _firebaseFirestore
-                    .collection('posts')
-                    .orderBy('time', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return SliverToBoxAdapter(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  var snapLength = snapshot.data!.docs.length;
-                  return SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        var snap = snapshot.data!.docs[index];
-                        return Container(
-                          color: Colors.grey[100],
-                          child: CachedImage(
-                            snap['postImage'],
-                          ),
-                        );
-                      },
-                      childCount: snapLength,
-                    ),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                    ),
-                  );
-                },
-              )
-            ],
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey[300],
+        title: const Text('My Profile'),
       ),
-    );
-  }
-
-  Widget Head(UserModels user) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-              child: ClipOval(
-                child: SizedBox(
-                  width: 80,
-                  height: 80,
-                  // child: CachedImage(''),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 15, // Added space between the image and numbers
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      '10',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.0.sp,
+      body: StreamBuilder<DocumentSnapshot>(
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final userData = snapshot.data!.data() as Map<String, dynamic>;
+            return FutureBuilder<QuerySnapshot>(
+              // Fetch user posts
+              future: userPostsCollection
+                  .where('UserEmail', isEqualTo: currentUser?.email)
+                  .get(),
+              builder: (context, userPostsSnapshot) {
+                if (userPostsSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (userPostsSnapshot.hasError) {
+                  return Center(
+                      child: Text('Error: ${userPostsSnapshot.error}'));
+                } else {
+                  final userPosts = userPostsSnapshot.data!.docs;
+                  return ListView(
+                    children: [
+                      const SizedBox(height: 50),
+                      const Icon(Icons.person,
+                          size: 100, color: Color.fromARGB(255, 0, 0, 0)),
+                      Text(
+                        currentUser?.email ?? '',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20, color: Colors.grey[700]),
                       ),
-                    ),
-                    SizedBox(
-                      width: 18.w,
-                    ),
-                    Text(
-                      // user.followers.length.toString(),
-                      '10',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.sp,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 22.w,
-                    ),
-                    Text(
-                      //user.following.length.toString(),
-                      '10',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Posts',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13.sp,
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: Text(
+                          'My Details',
+                          style: TextStyle(color: Colors.grey[600]),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 30,
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Followers',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13.sp,
+                      MyTextBox(
+                        text: userData['username'] ?? '',
+                        sectionName: 'username',
+                        onTap: () {
+                          print('Tapped on username');
+                          editField('username');
+                        },
+                      ),
+                      MyTextBox(
+                        text: userData['bio'] ?? '',
+                        sectionName: 'bio',
+                        onTap: () {
+                          print('Tapped on bio');
+                          editField('bio');
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: Text(
+                          'My Posts',
+                          style: TextStyle(color: Colors.grey[600]),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 30,
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Following',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13.sp,
+                      // Display user posts
+                      for (final post in userPosts)
+                        WallPost(
+                          messages: post['Message'],
+                          user: post['UserEmail'],
+                          postId: post.id,
+                          likes: List<String>.from(post['Likes'] ?? []),
+                          time: formatData(post['TimeStamp']), imageUrl: '',
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  user.username,
-                  style:
-                      TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'bio',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Container(
-              alignment: Alignment.center,
-              height: 30,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Color.fromARGB(255, 1, 158, 140),
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 1, 158, 140),
-                    fontSize: 15,
-                  ),
-                ),
-              )),
-        ),
-        SizedBox(
-          height: 30,
-          width: double.infinity,
-          child: TabBar(
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Color.fromARGB(255, 1, 158, 140),
-            tabs: [
-              Icon(
-                Icons.grid_on,
-                color: Color.fromARGB(255, 1, 158, 140),
-              ),
-            ],
-          ),
-        ),
-      ],
+                    ],
+                  );
+                }
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser?.email)
+            .snapshots(),
+      ),
     );
   }
 }

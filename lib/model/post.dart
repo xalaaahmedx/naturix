@@ -1,49 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
-  final String description;
-  final String uid;
-  final String username;
-  final likes;
-  final String postId;
-  final DateTime datePublished;
-  final String postUrl;
-  final String profImage;
+  final String user;
+  final String caption;
+  final List<String> imageUrls;
+  final Timestamp timestamp; // Make sure to import the 'cloud_firestore' package
 
-  const Post(
-      {required this.description,
-      required this.uid,
-      required this.username,
-      required this.likes,
-      required this.postId,
-      required this.datePublished,
-      required this.postUrl,
-      required this.profImage,
-      });
+  Post({
+    required this.user,
+    required this.caption,
+    required this.imageUrls,
+    required this.timestamp,
+  });
 
-  static Post fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
-
+  // A factory constructor to convert Firestore data to a Post object
+  factory Post.fromFirestore(Map<String, dynamic> data) {
     return Post(
-      description: snapshot["description"],
-      uid: snapshot["uid"],
-      likes: snapshot["likes"],
-      postId: snapshot["postId"],
-      datePublished: snapshot["datePublished"],
-      username: snapshot["username"],
-      postUrl: snapshot['postUrl'],
-      profImage: snapshot['profImage']
+      user: data['user'],
+      caption: data['caption'],
+      imageUrls: List<String>.from(data['imageUrls']),
+      timestamp: data['timestamp'],
     );
   }
-
-   Map<String, dynamic> toJson() => {
-        "description": description,
-        "uid": uid,
-        "likes": likes,
-        "username": username,
-        "postId": postId,
-        "datePublished": datePublished,
-        'postUrl': postUrl,
-        'profImage': profImage
-      };
 }

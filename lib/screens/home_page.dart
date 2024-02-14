@@ -1,7 +1,14 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:naturix/helper/helper_methods.dart';
+
+import 'package:naturix/screens/add_post_screen.dart';
+import 'package:naturix/screens/my_profile.dart';
 import 'package:naturix/widgets/addpostwidget.dart';
 
 import 'package:naturix/widgets/maindrawe.dart';
@@ -18,12 +25,33 @@ class _HomePageScreenState extends State<HomePageScreen> {
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   double value = 0;
   int currentIndex = 0;
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _pickedImage;
+
   late PageController _pageController;
+
+  final currentUser = FirebaseAuth.instance.currentUser;
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void dispose() {
-    _pageController.dispose();
     super.dispose();
+    _textEditingController.dispose();
+    _pageController.dispose();
+  }
+
+  void signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  void goToProfile() {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyProfile(),
+      ),
+    );
   }
 
   @override
@@ -37,6 +65,36 @@ class _HomePageScreenState extends State<HomePageScreen> {
       currentIndex = index;
       _pageController.jumpToPage(index);
     });
+  }
+
+  Future<void> pickImage() async {
+    final pickedImage =
+        await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _pickedImage = pickedImage;
+      });
+    }
+  }
+
+  Future<String?> uploadImageToFirebase(XFile pickedImage) async {
+    try {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference storageReference = storage
+          .ref()
+          .child('images/${DateTime.now().millisecondsSinceEpoch}');
+      File imageFile = File(pickedImage.path);
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+
+      await uploadTask.whenComplete(() => null);
+
+      String downloadUrl = await storageReference.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return null;
+    }
   }
 
   @override
@@ -113,83 +171,48 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                 ],
               ),
-              body: CustomScrollView(
-                slivers: [
-                  StreamBuilder(
-                    stream: _firebaseFirestore
-                        .collection('posts')
-                        .orderBy('time', descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return SliverToBoxAdapter(
-                            child: Center(child: CircularProgressIndicator()));
-                      }
+              body: Center(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('user posts')
+                            .orderBy('TimeStamp', descending: false)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView.builder(
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                final post = snapshot.data!.docs[index].data()
+                                    as Map<String, dynamic>;
 
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
+                                final imageUrl =
+                                    post['ImageUrl'] as String? ?? '';
 
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Center(child: Text('No posts available.'));
-                      }
-
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            return AddPostWidget(
-                                snapshot.data!.docs[index].data());
-                          },
-                          childCount: snapshot.data==null?0:snapshot.data!.docs.length,
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                                return WallPost(
+                                  messages: post['Message'],
+                                  user: post['UserEmail'],
+                                  postId: snapshot.data!.docs[index].id,
+                                  likes: List<String>.from(post['Likes'] ?? []),
+                                  time: formatData(post['TimeStamp']),
+                                  imageUrl: imageUrl,
+                                );
+                              },
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          }
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              /*Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: SizedBox(
-                      height: 50,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 2, 165, 146),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Placeholder for home page content
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Home Page Content',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
-                ],
-              ),*/
             ),
           ),
         ],

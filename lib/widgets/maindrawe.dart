@@ -1,3 +1,5 @@
+import 'package:date_format/date_format.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/tips_toggle.dart';
 import 'package:naturix/widgets/grocery_list.dart';
@@ -24,6 +26,10 @@ class _MainDrawerState extends State<MainDrawer>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     )..forward();
+  }
+
+  Future<void> signOut() async {
+    return await FirebaseAuth.instance.signOut();
   }
 
   @override
@@ -68,8 +74,7 @@ class _MainDrawerState extends State<MainDrawer>
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) =>  MyProfile()),
+                      MaterialPageRoute(builder: (context) => MyProfile()),
                     );
                   },
                 ),
@@ -116,7 +121,7 @@ class _MainDrawerState extends State<MainDrawer>
           buildDrawerItem(
             icon: Icons.logout,
             title: 'Logout',
-            onTap: () {},
+            onTap: signOut,
           ),
         ],
       ),

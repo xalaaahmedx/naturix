@@ -15,4 +15,17 @@ class UserModels {
     required this.following,
     // Add other parameters if needed
   });
+
+  // Add a factory constructor to create UserModels from a Map
+  factory UserModels.fromMap(Map<String, dynamic> map) {
+    return UserModels(
+      whoAmI: map['whoAmI'] ?? '',
+      email: map['email'] ?? '',
+      username: map['username'] ?? '',
+      profile: map['profile'] ?? '',
+      followers: List<String>.from(map['followers'] ?? []),
+      following: List<String>.from(map['following'] ?? []),
+      // Add other parameters if needed
+    );
+  }
 }

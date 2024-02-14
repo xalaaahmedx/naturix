@@ -3,7 +3,7 @@ import 'package:naturix/screens/chat.dart';
 import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/screens/tips.dart';
 import 'package:naturix/screens/organic_fertlizers_tips.dart';
-import 'package:naturix/screens/add_post.dart';
+
 
 
 class ToggleScreen extends StatefulWidget {
