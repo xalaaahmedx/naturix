@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
-import 'package:naturix/widgets/addpostwidget.dart';
+import 'package:naturix/screens/edit_profile.dart';
+import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/text_box.dart';
 
@@ -18,6 +23,80 @@ class _MyProfileState extends State<MyProfile> {
   final userCollection = FirebaseFirestore.instance.collection('users');
   final userPostsCollection =
       FirebaseFirestore.instance.collection('user posts');
+  final ImagePicker _imagePicker = ImagePicker();
+  late File _selectedImage = File('');
+  late int followersCount = 0;
+  late int followingCount = 0;
+  late int postsCount = 0;
+
+  Future<int> fetchFollowersCount(String userId) async {
+    try {
+      final followersSnapshot = await FirebaseFirestore.instance
+          .collection('followers')
+          .doc(userId)
+          .collection('userFollowers')
+          .get();
+
+      return followersSnapshot.size;
+    } catch (e) {
+      print('Error fetching followers count: $e');
+      return 0;
+    }
+  }
+
+// Example implementation for fetching following count
+  Future<int> fetchFollowingCount(String userId) async {
+    try {
+      final followingSnapshot = await FirebaseFirestore.instance
+          .collection('following')
+          .doc(userId)
+          .collection('userFollowing')
+          .get();
+
+      return followingSnapshot.size;
+    } catch (e) {
+      print('Error fetching following count: $e');
+      return 0;
+    }
+  }
+
+  Future<int> fetchPostsCount(String userEmail) async {
+    try {
+      final postsSnapshot = await FirebaseFirestore.instance
+          .collection('user posts')
+          .where('UserEmail', isEqualTo: userEmail)
+          .get();
+
+      return postsSnapshot.size;
+    } catch (e) {
+      print('Error fetching posts count: $e');
+      return 0;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure currentUser and its properties are not null
+    if (currentUser != null) {
+      // Fetch initial counts
+      String userId = currentUser?.uid ?? '';
+      fetchCounts(userId, currentUser?.email ?? '');
+    }
+  }
+
+  Future<void> fetchCounts(String userId, String userEmail) async {
+    followersCount = await fetchFollowersCount(userId);
+    followingCount = await fetchFollowingCount(userId);
+    postsCount = await fetchPostsCount(userEmail);
+
+    // Update the state to trigger a rebuild
+    setState(() {
+      followersCount = followersCount;
+      followingCount = followingCount;
+      postsCount = postsCount;
+    });
+  }
 
   Future<List<Comments>> fetchComments(String postId) async {
     try {
@@ -42,85 +121,56 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
- Future<void> editField(String field) async {
-  final controller = TextEditingController();
+  Future<void> _pickImageFromGallery() async {
+    final imageFile = await _imagePicker.pickImage(source: ImageSource.gallery);
 
-  print('Opening dialog for $field editing...');
+    if (imageFile != null) {
+      setState(() {
+        _selectedImage = File(imageFile.path);
+      });
 
-  try {
-    await showDialog(
-      context: context,
-      builder: (context) {
-        print('Dialog builder for $field');
-        return Dialog(
-          backgroundColor: Colors.grey[900],
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Edit $field',
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
-                SizedBox(height: 15),
-                TextField(
-                  controller: controller,
-                  autofocus: true,
-                  style: TextStyle(color: Colors.white),
-                  maxLines: field.toLowerCase() == 'password' ? 1 : null,
-                  obscureText: field.toLowerCase() == 'password',
-                  decoration: InputDecoration(
-                    hintText: 'Enter new $field',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(controller.text);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.blue,
-                      ),
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      // Upload the image to Firestore storage
+      await _uploadImageToStorage();
+    }
+  }
+
+  Future<void> _uploadImageToStorage() async {
+    try {
+      final Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_images/${currentUser?.uid}.jpg');
+
+      await storageReference.putFile(_selectedImage);
+      final String imageUrl = await storageReference.getDownloadURL();
+
+      // Update the user's profile image URL in Firestore
+      await userCollection
+          .doc(currentUser?.email)
+          .update({'profileImageUrl': imageUrl});
+    } catch (e) {
+      print('Error uploading image to storage: $e');
+    }
+  }
+
+  Future<void> _editField(Map<String, String> fields) async {
+    dynamic newValue = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditProfile(fields: fields),
+      ),
     );
-    print('Dialog closed for $field');
-  } catch (e) {
-    print('Error in showDialog: $e');
-  }
 
-  final newValue = controller.text;
-
-  if (newValue.isNotEmpty) {
-    await userCollection.doc(currentUser?.email).update({field: newValue});
+    if (newValue != null && newValue.isNotEmpty) {
+      fields.forEach((field, initialValue) async {
+        if (field.toLowerCase() == 'image') {
+          await _uploadImageToStorage();
+        } else {
+          await userCollection
+              .doc(currentUser?.email)
+              .update({field: newValue[field]});
+        }
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +185,12 @@ class _MyProfileState extends State<MyProfile> {
           IconButton(
             icon: Icon(Icons.edit, color: Colors.black),
             onPressed: () {
-              // Add edit profile action
+              // Example: Edit the username
+              _editField({
+                'username': 'Current Username',
+                'bio': 'Current Bio',
+                'image': 'Current Image',
+              });
             },
           ),
         ],
@@ -158,69 +213,112 @@ class _MyProfileState extends State<MyProfile> {
                   );
                 } else {
                   final userPosts = userPostsSnapshot.data!.docs;
-                  return ListView(
-                    padding: EdgeInsets.all(20),
+                  return Column(
                     children: [
-                      Card(
-                        color: Colors.grey[100],
-                        elevation: 5,
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundImage: NetworkImage(
-                                    'https://example.com/profile-image.jpg'), // Add your image URL
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(
+                                userData['profileImageUrl'] ??
+                                    'https://example.com/placeholder.jpg',
                               ),
-                              SizedBox(height: 20),
-                              Text(
-                                currentUser?.email ?? '',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.grey[700]),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              userData['username'] ?? '',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(height: 20),
-                              MyTextBox(
-                                text: userData['username'] ?? '',
-                                sectionName: 'Username',
-                                onTap: () {
-                                  print('Tapped on username');
-                                  editField('username');
-                                },
-                              ),
-                              MyTextBox(
-                                text: userData['bio'] ?? '',
-                                sectionName: 'Bio',
-                                onTap: () {
-                                  print('Tapped on bio');
-                                  editField('bio');
-                                },
-                              ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text(
+                                      '$postsCount',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text('Posts'),
+                                  ],
+                                ),
+                                SizedBox(width: 24),
+                                Column(
+                                  children: [
+                                    Text(
+                                      '$followersCount',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text('Followers'),
+                                  ],
+                                ),
+                                SizedBox(width: 24),
+                                Column(
+                                  children: [
+                                    Text(
+                                      '$followingCount',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text('Following'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      for (final post in userPosts)
-                        Card(
-                          elevation: 5,
-                          margin: EdgeInsets.only(bottom: 20),
-                          color: Colors.grey[100],
-                          child: WallPost(
-                            messages: post['Message'],
-                            user: post['UserEmail'],
-                            postId: post.id,
-                            likes: List<String>.from(post['Likes'] ?? []),
-                            time: formatData(post['TimeStamp']),
-                            imageUrl: (post.data()
-                                        as Map<String, dynamic>)['ImageUrl']
-                                    as String? ??
-                                '',
-                            commentsFuture: fetchComments(post.id),
-                          ),
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            ListTile(),
+                            MyTextBox(
+                              text: userData['bio'] ?? '',
+                              sectionName: 'Bio',
+                              onTap: () {
+                                _editField({
+                                  'username': 'Current Username',
+                                  'bio': 'Current Bio',
+                                  'image': 'Current Image',
+                                });
+                              },
+                            ),
+                            Divider(),
+                            for (final post in userPosts)
+                              Column(
+                                children: [
+                                  WallPost(
+                                    messages: post['Message'],
+                                    user: post['UserEmail'],
+                                    postId: post.id,
+                                    likes:
+                                        List<String>.from(post['Likes'] ?? []),
+                                    time: formatData(post['TimeStamp']),
+                                    imageUrl: (post.data() as Map<String,
+                                            dynamic>)['ImageUrl'] as String? ??
+                                        '',
+                                    commentsFuture: fetchComments(post.id),
+                                  ),
+                                  Divider(),
+                                ],
+                              ),
+                          ],
                         ),
+                      ),
                     ],
                   );
                 }

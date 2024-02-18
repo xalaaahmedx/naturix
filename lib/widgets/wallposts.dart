@@ -124,155 +124,161 @@ class _WallPostState extends State<WallPost> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Comments>>(
-        future: widget.commentsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            final List<Comments> comments = snapshot.data ?? [];
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              widget.user,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+      future: widget.commentsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final List<Comments> comments = snapshot.data ?? [];
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          // Display user avatar or profile picture
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              widget
+                                  .imageUrl, // Use the profileImageUrl field from the post
                             ),
-                            Text(
-                              ' • ',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            Text(
-                              widget.time,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.messages,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
                           ),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.user,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            ' • ',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            widget.time,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.messages,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
                         ),
-                      ],
-                    ),
-                    if (widget.user == currentUser.email)
-                      DeleteButton(onTap: deletePost),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (widget
-                    .imageUrl.isNotEmpty) // Check if imageUrl is not empty
-                  Container(
-                    height: 200, // Set the desired height for the image
-                    child: Image.network(
-                      widget.imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                      ),
+                    ],
                   ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        LikeButton(isLiked: isLiked, onTap: toggleLike),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.likes.length.toString(),
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                        const SizedBox(width: 16),
-                        CommentButton(
-                          onTap: () {
-                            setState(() {
-                              showComments = !showComments;
-                            });
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('user posts')
-                              .doc(widget.postId)
-                              .collection('Comments')
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Text(
-                                '0',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 14),
-                              );
-                            }
-                            return Text(
-                              snapshot.data!.docs.length.toString(),
+                  if (widget.user == currentUser.email)
+                    DeleteButton(onTap: deletePost),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (widget.imageUrl.isNotEmpty)
+                Container(
+                  height: 200,
+                  child: Image.network(
+                    widget.imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      LikeButton(isLiked: isLiked, onTap: toggleLike),
+                      const SizedBox(width: 8),
+                      Text(
+                        widget.likes.length.toString(),
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                      const SizedBox(width: 16),
+                      CommentButton(
+                        onTap: () {
+                          setState(() {
+                            showComments = !showComments;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('user posts')
+                            .doc(widget.postId)
+                            .collection('Comments')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Text(
+                              '0',
                               style:
                                   TextStyle(color: Colors.grey, fontSize: 14),
                             );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // Display comments if showComments is true
-                if (showComments) ...[
-                  _buildCommentInputField(),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('user posts')
-                        .doc(widget.postId)
-                        .collection('Comments')
-                        .orderBy('CommentTime', descending: true)
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-
-                      List<Widget> commentWidgets =
-                          snapshot.data!.docs.map<Widget>((doc) {
-                        final commentData = doc.data() as Map<String, dynamic>;
-                        return Comments(
-                          text: commentData['CommentText'],
-                          user: commentData['CommentedBy'],
-                          time: formatData(commentData['CommentTime']),
-                          imageUrl: null,
-                        );
-                      }).toList();
-
-                      return Column(
-                        children: commentWidgets,
-                      );
-                    },
+                          }
+                          return Text(
+                            snapshot.data!.docs.length.toString(),
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
+              ),
+              // Display comments if showComments is true
+              if (showComments) ...[
+                _buildCommentInputField(),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('user posts')
+                      .doc(widget.postId)
+                      .collection('Comments')
+                      .orderBy('CommentTime', descending: true)
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    List<Widget> commentWidgets =
+                        snapshot.data!.docs.map<Widget>((doc) {
+                      final commentData = doc.data() as Map<String, dynamic>;
+                      return Comments(
+                        text: commentData['CommentText'],
+                        user: commentData['CommentedBy'],
+                        time: formatData(commentData['CommentTime']),
+                        imageUrl: null,
+                      );
+                    }).toList();
+
+                    return Column(
+                      children: commentWidgets,
+                    );
+                  },
+                ),
               ],
-            );
-          }
-        });
+            ],
+          );
+        }
+      },
+    );
   }
 
   Widget _buildCommentItem(Comments comment) {

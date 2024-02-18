@@ -43,13 +43,6 @@ class MyTextBox extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              IconButton(
-                onPressed: onTap,
-                icon: const Icon(
-                  Icons.settings,
-                  color: Colors.blue,
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 10),
