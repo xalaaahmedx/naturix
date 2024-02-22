@@ -1,6 +1,7 @@
 import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/screens/tips_toggle.dart';
 import 'package:naturix/widgets/grocery_list.dart';
 import 'package:naturix/screens/my_profile.dart';
@@ -18,6 +19,7 @@ class MainDrawer extends StatefulWidget {
 class _MainDrawerState extends State<MainDrawer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late User currentUser;
 
   @override
   void initState() {
@@ -26,6 +28,8 @@ class _MainDrawerState extends State<MainDrawer>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     )..forward();
+
+    currentUser = FirebaseAuth.instance.currentUser!;
   }
 
   Future<void> signOut() async {
@@ -41,28 +45,44 @@ class _MainDrawerState extends State<MainDrawer>
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundImage: AssetImage('assets/images/berger.gif'),
-                ),
-                SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUser.email)
+                  .get(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return CircularProgressIndicator();
+                }
+
+                final userData = snapshot.data!.data() as Map<String, dynamic>;
+                final username = userData['username'] ?? '';
+                final profileImageUrl = userData['profileImageUrl'] ?? '';
+
+                return Row(
                   children: [
-                    Text(
-                      'John Doe',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'anekMalayalam',
-                      ),
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: NetworkImage(profileImageUrl),
+                    ),
+                    SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          username,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'anekMalayalam',
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
           Expanded(
@@ -84,7 +104,8 @@ class _MainDrawerState extends State<MainDrawer>
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Settings()),
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsScreen()),
                     );
                   },
                 ),

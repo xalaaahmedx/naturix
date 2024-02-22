@@ -29,6 +29,121 @@ class _MyProfileState extends State<MyProfile> {
   late int followingCount = 0;
   late int postsCount = 0;
 
+  Future<int> fetchPostsCount(String userEmail) async {
+    try {
+      final postsSnapshot = await FirebaseFirestore.instance
+          .collection('user posts')
+          .where('UserEmail', isEqualTo: userEmail)
+          .get();
+
+      return postsSnapshot.size;
+    } catch (e) {
+      print('Error fetching posts count: $e');
+      return 0;
+    }
+  }
+
+  Future<void> fetchUserCounts(String userEmail) async {
+    try {
+      int followers = await fetchFollowersCount(userEmail);
+      int following = await fetchFollowingCount(userEmail);
+      int posts = await fetchPostsCount(userEmail);
+
+      setState(() {
+        followersCount = followers;
+        followingCount = following;
+        postsCount = posts;
+      });
+    } catch (e) {
+      print('Error fetching user counts: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (currentUser != null) {
+      String userEmail = currentUser?.email ?? '';
+      fetchUserCounts(userEmail);
+    }
+  }
+
+  Future<void> fetchCounts(String userId, String userEmail) async {
+    try {
+      int followers = await fetchFollowersCount(userId);
+      int following = await fetchFollowingCount(userId);
+      int posts = await fetchPostsCount(userEmail);
+
+      setState(() {
+        followersCount = followers;
+        followingCount = following;
+        postsCount = posts;
+      });
+    } catch (e) {
+      print('Error fetching counts: $e');
+    }
+  }
+
+  Future<List<Comments>> fetchComments(String postId) async {
+    try {
+      final commentsSnapshot = await FirebaseFirestore.instance
+          .collection('user posts')
+          .doc(postId)
+          .collection('Comments')
+          .get();
+
+      return commentsSnapshot.docs.map((doc) {
+        final commentData = doc.data();
+        return Comments(
+          userProfileImageUrl: commentData['UserProfileImageUrl'],
+          text: commentData['CommentText'],
+          user: commentData['CommentedBy'],
+          time: formatData(commentData['CommentTime']),
+          imageUrl: null,
+        );
+      }).toList();
+    } catch (e) {
+      print('Error fetching comments: $e');
+      return [];
+    }
+  }
+
+  Future<void> _editField(Map<String, dynamic> fields) async {
+    final updatedValues = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditProfile(fields: fields),
+      ),
+    );
+
+    if (updatedValues != null) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser?.email)
+            .update(updatedValues);
+
+        setState(() {
+          // Update local state based on the updatedValues
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Profile updated successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } catch (e) {
+        print('Error updating profile: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating profile. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   Future<int> fetchFollowersCount(String userId) async {
     try {
       final followersSnapshot = await FirebaseFirestore.instance
@@ -44,7 +159,6 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-// Example implementation for fetching following count
   Future<int> fetchFollowingCount(String userId) async {
     try {
       final followingSnapshot = await FirebaseFirestore.instance
@@ -60,115 +174,62 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Future<int> fetchPostsCount(String userEmail) async {
+  Future<void> _changeProfilePicture() async {
     try {
-      final postsSnapshot = await FirebaseFirestore.instance
-          .collection('user posts')
-          .where('UserEmail', isEqualTo: userEmail)
-          .get();
+      final pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
 
-      return postsSnapshot.size;
-    } catch (e) {
-      print('Error fetching posts count: $e');
-      return 0;
-    }
-  }
+      if (pickedFile != null) {
+        String imageUrl = await uploadImageToFirebase(pickedFile.path);
 
-  @override
-  void initState() {
-    super.initState();
-    // Ensure currentUser and its properties are not null
-    if (currentUser != null) {
-      // Fetch initial counts
-      String userId = currentUser?.uid ?? '';
-      fetchCounts(userId, currentUser?.email ?? '');
-    }
-  }
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser?.email)
+            .update({'profileImageUrl': imageUrl});
 
-  Future<void> fetchCounts(String userId, String userEmail) async {
-    followersCount = await fetchFollowersCount(userId);
-    followingCount = await fetchFollowingCount(userId);
-    postsCount = await fetchPostsCount(userEmail);
+        setState(() {
+          followersCount = followersCount;
+          followingCount = followingCount;
+          postsCount = postsCount;
 
-    // Update the state to trigger a rebuild
-    setState(() {
-      followersCount = followersCount;
-      followingCount = followingCount;
-      postsCount = postsCount;
-    });
-  }
+          // Update local state based on the new image URL
+        });
 
-  Future<List<Comments>> fetchComments(String postId) async {
-    try {
-      final commentsSnapshot = await FirebaseFirestore.instance
-          .collection('user posts')
-          .doc(postId)
-          .collection('Comments')
-          .get();
-
-      return commentsSnapshot.docs.map((doc) {
-        final commentData = doc.data();
-        return Comments(
-          text: commentData['CommentText'],
-          user: commentData['CommentedBy'],
-          time: formatData(commentData['CommentTime']),
-          imageUrl: null,
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Profile picture updated successfully'),
+            duration: Duration(seconds: 2),
+          ),
         );
-      }).toList();
+      }
     } catch (e) {
-      print('Error fetching comments: $e');
-      return [];
+      print('Error changing profile picture: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error changing profile picture. Please try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
-  Future<void> _pickImageFromGallery() async {
-    final imageFile = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (imageFile != null) {
-      setState(() {
-        _selectedImage = File(imageFile.path);
-      });
-
-      // Pass a field (e.g., 'profileImage') to the _uploadImageToStorage method
-      await _uploadImageToStorage('profileImage');
-    }
-  }
-
-  Future<void> _uploadImageToStorage(String field) async {
+  Future<String> uploadImageToFirebase(String filePath) async {
     try {
-      final Reference storageReference = FirebaseStorage.instance
-          .ref()
-          .child('profile_images/${currentUser?.uid}_$field.jpg');
+      File file = File(filePath);
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('profile_images/$fileName');
+      await storageReference.putFile(file);
 
-      await storageReference.putFile(_selectedImage);
-      final String imageUrl = await storageReference.getDownloadURL();
+      // Get the download URL
+      String downloadURL = await storageReference.getDownloadURL();
 
-      // Update the user's profile image URL in Firestore
-      await userCollection
-          .doc(currentUser?.email)
-          .update({'profileImageUrl': imageUrl});
+      return downloadURL;
     } catch (e) {
-      print('Error uploading image to storage: $e');
-    }
-  }
-
-  Future<void> _editField(Map<String, String> fields) async {
-    dynamic newValue = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => EditProfile(fields: fields),
-      ),
-    );
-
-    if (newValue != null && newValue.isNotEmpty) {
-      fields.forEach((field, initialValue) async {
-        if (field.toLowerCase() == 'image') {
-          await _uploadImageToStorage(field); // Pass the field as an argument
-        } else {
-          await userCollection
-              .doc(currentUser?.email)
-              .update({field: newValue[field]});
-        }
-      });
+      print('Error uploading image to Firebase: $e');
+      throw Exception('Failed to upload image to Firebase Storage');
     }
   }
 
@@ -185,11 +246,9 @@ class _MyProfileState extends State<MyProfile> {
           IconButton(
             icon: Icon(Icons.edit, color: Colors.black),
             onPressed: () {
-              // Example: Edit the username
               _editField({
-                'username': 'Current Username',
-                'bio': 'Current Bio',
-                'image': 'Current Image',
+                'username': '',
+                'bio': '',
               });
             },
           ),
@@ -219,24 +278,78 @@ class _MyProfileState extends State<MyProfile> {
                         padding: EdgeInsets.all(16),
                         child: Column(
                           children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundImage: NetworkImage(
-                                userData['profileImageUrl'] ??
-                                    'https://example.com/placeholder.jpg',
+                            GestureDetector(
+                              onTap: _changeProfilePicture,
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 4,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 200,
+                                      backgroundImage: userData[
+                                                  'profileImageUrl'] !=
+                                              null
+                                          ? Image.network(
+                                                  userData['profileImageUrl']!)
+                                              .image
+                                          : AssetImage('assets/images/bear.png')
+                                              as ImageProvider,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 8,
+                                    right: 8,
+                                    child: Container(
+                                      padding: EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                      ),
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(height: 16),
                             Text(
                               userData['username'] ?? '',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             SizedBox(height: 8),
+                            Text(
+                              userData['bio'] ?? '',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Column(
                                   children: [
@@ -250,7 +363,6 @@ class _MyProfileState extends State<MyProfile> {
                                     Text('Posts'),
                                   ],
                                 ),
-                                SizedBox(width: 24),
                                 Column(
                                   children: [
                                     Text(
@@ -263,7 +375,6 @@ class _MyProfileState extends State<MyProfile> {
                                     Text('Followers'),
                                   ],
                                 ),
-                                SizedBox(width: 24),
                                 Column(
                                   children: [
                                     Text(
@@ -285,23 +396,15 @@ class _MyProfileState extends State<MyProfile> {
                         child: ListView(
                           padding: EdgeInsets.symmetric(horizontal: 16),
                           children: [
-                            ListTile(),
-                            MyTextBox(
-                              text: userData['bio'] ?? '',
-                              sectionName: 'Bio',
-                              onTap: () {
-                                _editField({
-                                  'username': 'Current Username',
-                                  'bio': 'Current Bio',
-                                  'image': 'Current Image',
-                                });
-                              },
-                            ),
                             Divider(),
                             for (final post in userPosts)
                               Column(
                                 children: [
                                   WallPost(
+                                    userProfileImageUrl:
+                                        userData['profileImageUrl']
+                                                as String? ??
+                                            '',
                                     messages: post['Message'],
                                     user: post['UserEmail'],
                                     postId: post.id,

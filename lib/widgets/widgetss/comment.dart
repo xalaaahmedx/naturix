@@ -1,79 +1,72 @@
 import 'package:flutter/material.dart';
 
 class Comments extends StatelessWidget {
+  final String userProfileImageUrl;
   final String text;
   final String user;
   final String time;
+  final String? imageUrl;
+  final String? username; // Add this line
 
-  const Comments({
-    Key? key,
+  Comments({
+    required this.userProfileImageUrl,
     required this.text,
     required this.user,
-    required this.time, required imageUrl,
-  }) : super(key: key);
+    required this.time,
+    required this.imageUrl,
+    this.username, // Add this line
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.grey[300],
-            radius: 20,
-            child: Text(
-              user[0].toUpperCase(),
-              style: TextStyle(color: Colors.black, fontSize: 18),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(userProfileImageUrl),
+              radius: 16,
             ),
+            const SizedBox(width: 8),
+            Text(
+              username ??
+                  user, // Use username if available, otherwise use user email
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        text,
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            user,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '• $time',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          time,
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
+          ),
+        ),
+        if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            height: 100,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(imageUrl!),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 }

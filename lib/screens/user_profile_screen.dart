@@ -1,12 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
 class UserProfile extends StatefulWidget {
   final String useremail;
-  final String currentUserEmail; // Add current user email
+  final String currentUserEmail;
 
   const UserProfile({
     Key? key,
@@ -23,6 +23,7 @@ class _UserProfileState extends State<UserProfile> {
   late int followersCount = 0;
   late int followingCount = 0;
   bool isFollowing = false;
+  late String bio = '';
 
   Future<List<Comments>> fetchComments(String postId) async {
     try {
@@ -36,10 +37,11 @@ class _UserProfileState extends State<UserProfile> {
       return querySnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return Comments(
+          userProfileImageUrl: data['UserProfileImageUrl'], // Fix this line
           text: data['CommentText'],
           user: data['CommentedBy'],
           time: formatData(data['CommentTime']),
-          imageUrl: null, // You can modify this based on your data structure
+          imageUrl: null,
         );
       }).toList();
     } catch (e) {
@@ -53,6 +55,7 @@ class _UserProfileState extends State<UserProfile> {
     super.initState();
     fetchCounts();
     checkIfFollowing();
+    fetchBio();
   }
 
   Future<void> fetchCounts() async {
@@ -101,10 +104,24 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
+  Future<void> fetchBio() async {
+    try {
+      final bioSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.useremail)
+          .get();
+
+      setState(() {
+        bio = bioSnapshot.get('bio') ?? '';
+      });
+    } catch (e) {
+      print('Error fetching bio: $e');
+    }
+  }
+
   Future<void> toggleFollow() async {
     try {
       if (isFollowing) {
-        // Unfollow the user
         await FirebaseFirestore.instance
             .collection('following')
             .doc(widget.currentUserEmail)
@@ -119,7 +136,6 @@ class _UserProfileState extends State<UserProfile> {
             .doc(widget.currentUserEmail)
             .delete();
       } else {
-        // Follow the user
         await FirebaseFirestore.instance
             .collection('following')
             .doc(widget.currentUserEmail)
@@ -135,12 +151,10 @@ class _UserProfileState extends State<UserProfile> {
             .set({});
       }
 
-      // Update following status
       setState(() {
         isFollowing = !isFollowing;
       });
 
-      // Update follower and following counts
       fetchCounts();
     } catch (e) {
       print('Error toggling follow: $e');
@@ -156,82 +170,144 @@ class _UserProfileState extends State<UserProfile> {
           'User Profile',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
-        elevation: 0,
       ),
       body: StreamBuilder<DocumentSnapshot>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Hero(
-                        tag: 'userImage${widget.useremail}',
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            userData['profileImageUrl'] ??
-                                'https://example.com/default-profile-image.jpg',
-                          ),
-                          radius: 50,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        userData['username'] ?? '',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildCountColumn('Posts', postsCount),
-                          SizedBox(width: 16),
-                          _buildCountColumn('Followers', followersCount),
-                          SizedBox(width: 16),
-                          _buildCountColumn('Following', followingCount),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: toggleFollow,
-                        style: ElevatedButton.styleFrom(
-                          primary: isFollowing
-                              ? Colors.grey
-                              : Color.fromARGB(255, 1, 158,
-                                  140), // Use different colors for follow and unfollow
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                20.0), // Adjust the border radius as needed
+                SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // Implement the image change functionality if needed
+                          },
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 4,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                userData['profileImageUrl'] ??
+                                    'https://example.com/default-profile-image.jpg',
+                              ),
+                              radius: 50,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          isFollowing ? 'Unfollow' : 'Follow',
+                        SizedBox(height: 16),
+                        Text(
+                          userData['username'] ?? '',
                           style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          bio,
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  '$postsCount',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text('Posts'),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '$followersCount',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text('Followers'),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '$followingCount',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text('Following'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: toggleFollow,
+                  style: ElevatedButton.styleFrom(
+                    primary: isFollowing
+                        ? Colors.grey[200]
+                        : Color.fromARGB(255, 1, 158, 140),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                  child: Text(
+                    isFollowing ? 'Unfollow' : 'Follow',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'User Posts',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'User Posts',
+                      style: TextStyle(
+                        fontFamily: 'anekMalayalam',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
@@ -250,6 +326,9 @@ class _UserProfileState extends State<UserProfile> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: WallPost(
+                                  userProfileImageUrl:
+                                      userData['profileImageUrl'] as String? ??
+                                          '',
                                   messages: post['Message'],
                                   user: post['UserEmail'],
                                   postId: posts[index].id,
@@ -294,28 +373,6 @@ class _UserProfileState extends State<UserProfile> {
             .doc(widget.useremail)
             .snapshots(),
       ),
-    );
-  }
-
-  Widget _buildCountColumn(String label, int count) {
-    return Column(
-      children: [
-        Text(
-          count.toString(),
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-        ),
-      ],
     );
   }
 }

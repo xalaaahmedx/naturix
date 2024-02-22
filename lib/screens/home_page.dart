@@ -50,8 +50,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
       return commentsSnapshot.docs.map((doc) {
         final commentData = doc.data();
         return Comments(
-          text: commentData['CommentText'],
-          user: commentData['CommentedBy'],
+          userProfileImageUrl:
+              commentData['UserProfileImageUrl'] as String? ?? '',
+          text: commentData['CommentText'] as String? ?? '',
+          user: commentData['CommentedBy'] as String? ?? '',
           time: formatData(commentData['CommentTime']),
           imageUrl: null,
         );
@@ -215,65 +217,98 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                         .data() as Map<String, dynamic>;
                                     final imageUrl =
                                         post['ImageUrl'] as String? ?? '';
+
                                     return FutureBuilder(
                                       future: FirebaseFirestore.instance
-                                          .collection('user posts')
-                                          .doc(snapshot.data!.docs[index].id)
-                                          .collection('Comments')
-                                          .orderBy('CommentTime',
-                                              descending: true)
+                                          .collection('users')
+                                          .doc(post['UserEmail'])
                                           .get(),
-                                      builder: (context, commentSnapshot) {
-                                        if (commentSnapshot.connectionState ==
+                                      builder: (context, userSnapshot) {
+                                        if (userSnapshot.connectionState ==
                                                 ConnectionState.waiting ||
-                                            !commentSnapshot.hasData) {
+                                            !userSnapshot.hasData) {
                                           return CircularProgressIndicator();
                                         }
 
-                                        final comments = commentSnapshot
-                                            .data!.docs
-                                            .map<Comments>((doc) {
-                                          final commentData = doc.data()
-                                              as Map<String, dynamic>;
-                                          return Comments(
-                                            text: commentData['CommentText'],
-                                            user: commentData['CommentedBy'],
-                                            time: formatData(
-                                                commentData['CommentTime']),
-                                            imageUrl: null,
-                                          );
-                                        }).toList();
+                                        final userData = userSnapshot.data!
+                                            .data() as Map<String, dynamic>;
 
-                                        return Card(
-                                          elevation: 2,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16),
-                                            child: Column(
-                                              children: [
-                                                WallPost(
-                                                  messages: post['Message'],
-                                                  user: post['UserEmail'],
-                                                  postId: snapshot.data!
-                                                          .docs[index].id ??
-                                                      '',
-                                                  likes: List<String>.from(
-                                                      post['Likes'] ?? []),
-                                                  time: formatData(
-                                                      post['TimeStamp']),
-                                                  imageUrl: imageUrl,
-                                                  commentsFuture: fetchComments(
-                                                      snapshot.data!.docs[index]
-                                                              .id ??
-                                                          ''),
+                                        return FutureBuilder(
+                                          future: FirebaseFirestore.instance
+                                              .collection('user posts')
+                                              .doc(
+                                                  snapshot.data!.docs[index].id)
+                                              .collection('Comments')
+                                              .orderBy('CommentTime',
+                                                  descending: true)
+                                              .get(),
+                                          builder: (context, commentSnapshot) {
+                                            if (commentSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.waiting ||
+                                                !commentSnapshot.hasData) {
+                                              return CircularProgressIndicator();
+                                            }
+
+                                            final comments = commentSnapshot
+                                                .data!.docs
+                                                .map<Comments>((doc) {
+                                              final commentData = doc.data()
+                                                  as Map<String, dynamic>;
+                                              return Comments(
+                                                userProfileImageUrl:
+                                                    userData['profileImageUrl']
+                                                            as String? ??
+                                                        '',
+                                                text:
+                                                    commentData['CommentText'],
+                                                user:
+                                                    commentData['CommentedBy'],
+                                                time: formatData(
+                                                    commentData['CommentTime']),
+                                                imageUrl: null,
+                                              );
+                                            }).toList();
+
+                                            return Card(
+                                              elevation: 2,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(16),
+                                                child: Column(
+                                                  children: [
+                                                    WallPost(
+                                                      userProfileImageUrl:
+                                                          userData['profileImageUrl']
+                                                                  as String? ??
+                                                              '',
+                                                      messages: post['Message'],
+                                                      user: post['UserEmail'],
+                                                      postId: snapshot.data!
+                                                              .docs[index].id ??
+                                                          '',
+                                                      likes: List<String>.from(
+                                                          post['Likes'] ?? []),
+                                                      time: formatData(
+                                                          post['TimeStamp']),
+                                                      imageUrl: imageUrl,
+                                                      commentsFuture:
+                                                          fetchComments(snapshot
+                                                                  .data!
+                                                                  .docs[index]
+                                                                  .id ??
+                                                              ''),
+                                                    ),
+                                                    const SizedBox(height: 16),
+                                                  ],
                                                 ),
-                                                const SizedBox(height: 16),
-                                              ],
-                                            ),
-                                          ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
                                     );

@@ -21,6 +21,7 @@ class WallPost extends StatefulWidget {
     required this.time,
     required this.imageUrl,
     required this.commentsFuture,
+    required this.userProfileImageUrl,
   }) : super(key: key);
 
   final String messages;
@@ -30,6 +31,7 @@ class WallPost extends StatefulWidget {
   final List<String> likes;
   final String imageUrl;
   final Future<List<Comments>> commentsFuture;
+  final String userProfileImageUrl;
 
   @override
   State<WallPost> createState() => _WallPostState();
@@ -38,7 +40,7 @@ class WallPost extends StatefulWidget {
 class _WallPostState extends State<WallPost> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   bool isLiked = false;
-  bool showComments = false; // Track whether to show comments or not
+  bool showComments = false;
   final TextEditingController commentController = TextEditingController();
 
   @override
@@ -47,49 +49,57 @@ class _WallPostState extends State<WallPost> {
     isLiked = widget.likes.contains(currentUser.email);
   }
 
-  void deletePost() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete Post'),
-        content: const Text('Are you sure you want to delete this post?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final commentDocs = await FirebaseFirestore.instance
-                  .collection('user posts')
-                  .doc(widget.postId)
-                  .collection('Comments')
-                  .get();
-              for (var doc in commentDocs.docs) {
-                await FirebaseFirestore.instance
+  void deletePost() async {
+    if (widget.user == currentUser.email) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Delete Post'),
+          content: const Text('Are you sure you want to delete this post?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final commentDocs = await FirebaseFirestore.instance
                     .collection('user posts')
                     .doc(widget.postId)
                     .collection('Comments')
-                    .doc(doc.id)
-                    .delete();
-              }
+                    .get();
+                for (var doc in commentDocs.docs) {
+                  await FirebaseFirestore.instance
+                      .collection('user posts')
+                      .doc(widget.postId)
+                      .collection('Comments')
+                      .doc(doc.id)
+                      .delete();
+                }
 
-              FirebaseFirestore.instance
-                  .collection('user posts')
-                  .doc(widget.postId)
-                  .delete()
-                  .then((value) => print('Post Deleted'))
-                  .catchError(
-                      (error) => print('Failed to delete post: $error'));
-              Navigator.pop(context);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+                FirebaseFirestore.instance
+                    .collection('user posts')
+                    .doc(widget.postId)
+                    .delete()
+                    .then((value) => print('Post Deleted'))
+                    .catchError(
+                        (error) => print('Failed to delete post: $error'));
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("You can only delete your own posts."),
+        ),
+      );
+    }
   }
 
   void toggleLike() {
@@ -135,47 +145,60 @@ class _WallPostState extends State<WallPost> {
         } else {
           final List<Comments> comments = snapshot.data ?? [];
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Row(
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserProfile(
+                              useremail: widget.user,
+                              currentUserEmail: currentUser.email!,
+                            ),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          widget.userProfileImageUrl,
+                        ),
+                        radius: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Display user avatar or profile picture
-                          GestureDetector(
-                            onTap: () {
-                              // Navigate to the user's profile page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => UserProfile(
-                                          useremail: widget.user,
-                                          currentUserEmail: currentUser.email!,
-                                        )),
+                          FutureBuilder<DocumentSnapshot>(
+                            future: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(widget.user)
+                                .get(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Text('Loading...');
+                              }
+
+                              final userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              final username = userData['username'] ?? '';
+
+                              return Text(
+                                username,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               );
                             },
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                widget.imageUrl,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.user,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
                           ),
                           Text(
                             widget.time,
@@ -185,76 +208,95 @@ class _WallPostState extends State<WallPost> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        widget.messages,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
+                    ),
+                    if (widget.user == currentUser.email)
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red,
                         ),
+                        onPressed: () => deletePost(),
                       ),
-                    ],
-                  ),
-                  if (widget.user == currentUser.email)
-                    DeleteButton(onTap: deletePost),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  widget.messages,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
               if (widget.imageUrl.isNotEmpty)
                 Container(
                   height: 200,
-                  child: Image.network(
-                    widget.imageUrl,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        widget.imageUrl,
+                      ),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      LikeButton(isLiked: isLiked, onTap: toggleLike),
-                      const SizedBox(width: 8),
-                      Text(
-                        widget.likes.length.toString(),
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                      const SizedBox(width: 16),
-                      CommentButton(
-                        onTap: () {
-                          setState(() {
-                            showComments = !showComments;
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection('user posts')
-                            .doc(widget.postId)
-                            .collection('Comments')
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Text(
-                              '0',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        LikeButton(isLiked: isLiked, onTap: toggleLike),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.likes.length.toString(),
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        CommentButton(
+                          onTap: () {
+                            setState(() {
+                              showComments = !showComments;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('user posts')
+                              .doc(widget.postId)
+                              .collection('Comments')
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Text(
+                                '0',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              );
+                            }
+                            return Text(
+                              snapshot.data!.docs.length.toString(),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
                             );
-                          }
-                          return Text(
-                            snapshot.data!.docs.length.toString(),
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              // Display comments if showComments is true
               if (showComments) ...[
                 _buildCommentInputField(),
                 StreamBuilder(
@@ -275,10 +317,12 @@ class _WallPostState extends State<WallPost> {
                         snapshot.data!.docs.map<Widget>((doc) {
                       final commentData = doc.data() as Map<String, dynamic>;
                       return Comments(
-                        text: commentData['CommentText'],
                         user: commentData['CommentedBy'],
+                        userProfileImageUrl: widget.userProfileImageUrl,
+                        text: commentData['CommentText'],
                         time: formatData(commentData['CommentTime']),
                         imageUrl: null,
+                        username: commentData['username'], // Add this line
                       );
                     }).toList();
 
@@ -295,59 +339,18 @@ class _WallPostState extends State<WallPost> {
     );
   }
 
-  Widget _buildCommentItem(Comments comment) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Display user avatar or profile picture
-          CircleAvatar(
-            // You can replace this with the user's profile picture
-            child: Text(comment.user[0].toUpperCase()),
-          ),
-          const SizedBox(width: 8),
-          // Display comment details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  comment.user,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(comment.text),
-                const SizedBox(height: 8),
-                Text(
-                  comment.time,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildCommentInputField() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          // Add an avatar or profile picture for the current user
           CircleAvatar(
-            // You can replace this with the current user's profile picture
-            child: Text(currentUser!.email![0].toUpperCase()),
+            backgroundImage: NetworkImage(
+              currentUser.photoURL ?? '',
+            ),
+            radius: 24,
           ),
           const SizedBox(width: 8),
-          // Add a text input field for entering new comments
           Expanded(
             child: TextFormField(
               controller: commentController,
@@ -360,9 +363,8 @@ class _WallPostState extends State<WallPost> {
               ),
             ),
           ),
-          // Add a send button to post the comment
           IconButton(
-            icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
+            icon: Icon(Icons.send, color: Color.fromARGB(255, 1, 158, 140)),
             onPressed: () {
               if (commentController.text.isNotEmpty) {
                 addComment(commentController.text);
