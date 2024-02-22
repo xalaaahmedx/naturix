@@ -129,16 +129,16 @@ class _MyProfileState extends State<MyProfile> {
         _selectedImage = File(imageFile.path);
       });
 
-      // Upload the image to Firestore storage
-      await _uploadImageToStorage();
+      // Pass a field (e.g., 'profileImage') to the _uploadImageToStorage method
+      await _uploadImageToStorage('profileImage');
     }
   }
 
-  Future<void> _uploadImageToStorage() async {
+  Future<void> _uploadImageToStorage(String field) async {
     try {
       final Reference storageReference = FirebaseStorage.instance
           .ref()
-          .child('profile_images/${currentUser?.uid}.jpg');
+          .child('profile_images/${currentUser?.uid}_$field.jpg');
 
       await storageReference.putFile(_selectedImage);
       final String imageUrl = await storageReference.getDownloadURL();
@@ -162,7 +162,7 @@ class _MyProfileState extends State<MyProfile> {
     if (newValue != null && newValue.isNotEmpty) {
       fields.forEach((field, initialValue) async {
         if (field.toLowerCase() == 'image') {
-          await _uploadImageToStorage();
+          await _uploadImageToStorage(field); // Pass the field as an argument
         } else {
           await userCollection
               .doc(currentUser?.email)

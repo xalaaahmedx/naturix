@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:naturix/screens/my_profile.dart';
+import 'package:naturix/screens/user_profile_screen.dart';
 
 import 'package:naturix/widgets/widgetss/comment.dart';
 
@@ -142,10 +144,22 @@ class _WallPostState extends State<WallPost> {
                       Row(
                         children: [
                           // Display user avatar or profile picture
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              widget
-                                  .imageUrl, // Use the profileImageUrl field from the post
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to the user's profile page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UserProfile(
+                                          useremail: widget.user,
+                                          currentUserEmail: currentUser.email!,
+                                        )),
+                              );
+                            },
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                widget.imageUrl,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
