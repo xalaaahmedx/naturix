@@ -42,6 +42,7 @@ class _MainDrawerState extends State<MainDrawer>
       elevation: 0,
       backgroundColor: const Color.fromARGB(0, 255, 255, 255),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // Align to start (left)
         children: [
           Container(
             padding: const EdgeInsets.all(20),
@@ -59,26 +60,25 @@ class _MainDrawerState extends State<MainDrawer>
                 final username = userData['username'] ?? '';
                 final profileImageUrl = userData['profileImageUrl'] ?? '';
 
-                return Row(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 25,
+                      radius: 40, // Increased size of the image
                       backgroundImage: NetworkImage(profileImageUrl),
                     ),
-                    SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          username,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'anekMalayalam',
-                          ),
+                    SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        username,
+                        style: TextStyle(
+                          fontSize: 18, // Increased font size
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'anekMalayalam',
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 );
