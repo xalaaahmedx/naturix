@@ -37,7 +37,7 @@ class _UserProfileState extends State<UserProfile> {
       return querySnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return Comments(
-          userProfileImageUrl: data['UserProfileImageUrl'], // Fix this line
+          userProfileImageUrl: data['UserProfileImageUrl'],
           text: data['CommentText'],
           user: data['CommentedBy'],
           time: formatData(data['CommentTime']),
@@ -165,11 +165,7 @@ class _UserProfileState extends State<UserProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[100],
-        title: Text(
-          'User Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
+        backgroundColor: Color.fromARGB(255, 1, 158, 140),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         builder: (context, snapshot) {
@@ -177,123 +173,130 @@ class _UserProfileState extends State<UserProfile> {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
             return Column(
               children: [
-                SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            // Implement the image change functionality if needed
-                          },
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 4,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                userData['profileImageUrl'] ??
-                                    'https://example.com/default-profile-image.jpg',
-                              ),
-                              radius: 50,
-                            ),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 1, 158, 140),
+                        Color.fromARGB(255, 0, 109, 97),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 24),
+                      GestureDetector(
+                        onTap: () {
+                          // Implement the image change functionality if needed
+                        },
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            userData['profileImageUrl'] ??
+                                'https://example.com/default-profile-image.jpg',
                           ),
+                          radius: 50,
                         ),
-                        SizedBox(height: 16),
-                        Text(
-                          userData['username'] ?? '',
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        userData['username'] ?? '',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        bio,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                '$postsCount',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Posts',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                '$followersCount',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Followers',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                '$followingCount',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Following',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: toggleFollow,
+                        style: ElevatedButton.styleFrom(
+                          primary: isFollowing
+                              ? Colors.grey[200]
+                              : Color.fromARGB(255, 1, 158, 140),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                        ),
+                        child: Text(
+                          isFollowing ? 'Unfollow' : 'Follow',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          bio,
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '$postsCount',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('Posts'),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '$followersCount',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('Followers'),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '$followingCount',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text('Following'),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: toggleFollow,
-                  style: ElevatedButton.styleFrom(
-                    primary: isFollowing
-                        ? Colors.grey[200]
-                        : Color.fromARGB(255, 1, 158, 140),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  ),
-                  child: Text(
-                    isFollowing ? 'Unfollow' : 'Follow',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                Divider(),
                 SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.all(10),

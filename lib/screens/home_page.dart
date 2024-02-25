@@ -160,11 +160,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
               extendBody: true,
               backgroundColor: Colors.grey[100],
               appBar: AppBar(
-                elevation: 2, // Add elevation for a subtle shadow effect
+                elevation: 2,
                 title: Text(
                   'Naturix',
                   style: TextStyle(
-                    fontFamily: 'anekMalayalam', // Add your custom font here
+                    fontFamily: 'anekMalayalam',
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                     fontSize: 24,
@@ -227,7 +227,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                         if (userSnapshot.connectionState ==
                                                 ConnectionState.waiting ||
                                             !userSnapshot.hasData) {
-                                          return CircularProgressIndicator();
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              // Modernizing the circular progress indicator
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                Color.fromARGB(
+                                                    255, 1, 158, 140),
+                                              ),
+                                            ),
+                                          );
                                         }
 
                                         final userData = userSnapshot.data!
@@ -247,7 +256,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                                         .connectionState ==
                                                     ConnectionState.waiting ||
                                                 !commentSnapshot.hasData) {
-                                              return CircularProgressIndicator();
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  // Modernizing the circular progress indicator
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(
+                                                    Color.fromARGB(
+                                                        255, 1, 158, 140),
+                                                  ),
+                                                ),
+                                              );
                                             }
 
                                             final comments = commentSnapshot
@@ -318,7 +338,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                   child: Text('Error: ${snapshot.error}'));
                             }
                             return const Center(
-                                child: CircularProgressIndicator());
+                                child: CircularProgressIndicator(
+                              // Modernizing the circular progress indicator
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color.fromARGB(255, 1, 158, 140),
+                              ),
+                            ));
                           },
                         ),
                       ),

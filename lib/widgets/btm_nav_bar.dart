@@ -2,11 +2,11 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/add_post_screen.dart';
 import 'package:naturix/screens/chat.dart';
+import 'package:naturix/screens/chat/homepage.dart';
 import 'package:naturix/screens/home_page.dart';
 
 import 'package:naturix/screens/likes.dart';
 import 'package:naturix/screens/search.dart';
-
 
 class BtmNavBar extends StatefulWidget {
   const BtmNavBar({super.key});
@@ -51,12 +51,12 @@ class _BtmNavBarState extends State<BtmNavBar> {
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
-        children:  [
+        children: [
           HomePageScreen(),
           Search(),
           AddPostScreen(),
           Likes(),
-          Chat(),
+          HomePage(),
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(

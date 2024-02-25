@@ -65,6 +65,7 @@ class _MyProfileState extends State<MyProfile> {
     if (currentUser != null) {
       String userEmail = currentUser?.email ?? '';
       fetchUserCounts(userEmail);
+      checkAndAddEmailField(userEmail);
     }
   }
 
@@ -215,6 +216,20 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
+  Future<void> checkAndAddEmailField(String userEmail) async {
+    try {
+      final userDoc = await userCollection.doc(userEmail).get();
+      if (!userDoc.exists || !userDoc.data()!.containsKey('email')) {
+        // Add the email field to the user document
+        await userCollection.doc(userEmail).set({
+          'email': userEmail,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      print('Error checking and adding email field: $e');
+    }
+  }
+
   Future<String> uploadImageToFirebase(String filePath) async {
     try {
       File file = File(filePath);
@@ -237,11 +252,7 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[100],
-        title: Text(
-          'My Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
+        backgroundColor: Color.fromARGB(255, 1, 158, 140),
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: Colors.black),
@@ -276,6 +287,16 @@ class _MyProfileState extends State<MyProfile> {
                     children: [
                       Container(
                         padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 1, 158, 140),
+                              Color.fromARGB(255, 0, 109, 97),
+                            ], // Customize the gradient colors
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
                         child: Column(
                           children: [
                             GestureDetector(
@@ -283,8 +304,8 @@ class _MyProfileState extends State<MyProfile> {
                               child: Stack(
                                 children: [
                                   Container(
-                                    width: 100,
-                                    height: 100,
+                                    width: 120,
+                                    height: 120,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
@@ -302,6 +323,7 @@ class _MyProfileState extends State<MyProfile> {
                                     ),
                                     child: CircleAvatar(
                                       radius: 200,
+                                      backgroundColor: Colors.white,
                                       backgroundImage: userData[
                                                   'profileImageUrl'] !=
                                               null
@@ -337,6 +359,7 @@ class _MyProfileState extends State<MyProfile> {
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                             SizedBox(height: 8),
@@ -344,6 +367,7 @@ class _MyProfileState extends State<MyProfile> {
                               userData['bio'] ?? '',
                               style: TextStyle(
                                 fontSize: 16,
+                                color: Colors.white,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -358,9 +382,15 @@ class _MyProfileState extends State<MyProfile> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                    Text('Posts'),
+                                    Text(
+                                      'Posts',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 Column(
@@ -370,9 +400,15 @@ class _MyProfileState extends State<MyProfile> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                    Text('Followers'),
+                                    Text(
+                                      'Followers',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 Column(
@@ -382,9 +418,15 @@ class _MyProfileState extends State<MyProfile> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                    Text('Following'),
+                                    Text(
+                                      'Following',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
