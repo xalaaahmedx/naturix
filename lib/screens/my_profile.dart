@@ -175,47 +175,6 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Future<void> _changeProfilePicture() async {
-    try {
-      final pickedFile = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 50,
-      );
-
-      if (pickedFile != null) {
-        String imageUrl = await uploadImageToFirebase(pickedFile.path);
-
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser?.email)
-            .update({'profileImageUrl': imageUrl});
-
-        setState(() {
-          followersCount = followersCount;
-          followingCount = followingCount;
-          postsCount = postsCount;
-
-          // Update local state based on the new image URL
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile picture updated successfully'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error changing profile picture: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error changing profile picture. Please try again.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   Future<void> checkAndAddEmailField(String userEmail) async {
     try {
       final userDoc = await userCollection.doc(userEmail).get();
@@ -227,6 +186,60 @@ class _MyProfileState extends State<MyProfile> {
       }
     } catch (e) {
       print('Error checking and adding email field: $e');
+    }
+  }
+
+  Future<void> updateProfileImageUrl(String imageUrl) async {
+    try {
+      // Update the profile image URL in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.email)
+          .update({'profileImageUrl': imageUrl});
+    } catch (e) {
+      print('Error updating profile image URL: $e');
+      throw Exception('Failed to update profile image URL');
+    }
+  }
+
+  Future<void> _changeProfilePicture() async {
+    try {
+      final pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
+
+      if (pickedFile != null) {
+        String imageUrl = await uploadImageToFirebase(pickedFile.path);
+
+        // Update the profile image URL in Firestore
+        await updateProfileImageUrl(imageUrl);
+
+        // Update the local state based on the new image URL
+        setState(() {
+          // Assuming you want to update only the profileImageUrl
+          followersCount = followersCount;
+          followingCount = followingCount;
+          postsCount = postsCount;
+        });
+
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Profile picture updated successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error changing profile picture: $e');
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error changing profile picture. Please try again.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 

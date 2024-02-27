@@ -52,11 +52,26 @@ class _MainDrawerState extends State<MainDrawer>
                   .doc(currentUser.email)
                   .get(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 }
 
-                final userData = snapshot.data!.data() as Map<String, dynamic>;
+                if (snapshot.hasError || snapshot.data == null) {
+                  // Handle the error or absence of data, for now, log out the user
+                  signOut();
+                  return Container();
+                }
+
+                final userData =
+                    (snapshot.data! as DocumentSnapshot<Map<String, dynamic>>)
+                        .data();
+
+                if (userData == null) {
+                  // Handle the case when userData is null, for now, log out the user
+                  signOut();
+                  return Container();
+                }
+
                 final username = userData['username'] ?? '';
                 final profileImageUrl = userData['profileImageUrl'] ?? '';
 
