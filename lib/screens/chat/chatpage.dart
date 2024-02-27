@@ -1,29 +1,59 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/model/message.dart';
 import 'package:naturix/services/chat_service/chat_service.dart';
 import 'package:naturix/widgets/chat/chat_bubble.dart';
 
 class ChatPage extends StatefulWidget {
   final String recieverUserId;
   final String userEmail;
-  const ChatPage(
-      {Key? key, required this.userEmail, required this.recieverUserId})
-      : super(key: key);
+
+  const ChatPage({
+    Key? key,
+    required this.userEmail,
+    required this.recieverUserId,
+  }) : super(key: key);
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final ChatService _chatService = ChatService();
+  String username = ''; // Add a variable to store the username
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsername(); // Fetch the username when the widget initializes
+  }
+
+  void fetchUsername() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userEmail)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          username = userDoc.get('username');
+        });
+      }
+    } catch (e) {
+      print('Error fetching username: $e');
+    }
+  }
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
-          widget.recieverUserId, _messageController.text);
+        widget.recieverUserId,
+        _messageController.text,
+      );
       _messageController.clear();
     }
   }
@@ -33,8 +63,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 78, 27, 111),
-        title: Text(widget.userEmail,
-            style: TextStyle(fontSize: 16, color: Colors.white)),
+        title: Text(username), // Display username in the app bar title
       ),
       body: Column(
         children: [
@@ -94,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Text(data['senderEmail'] ?? ''),
             const SizedBox(height: 2),
-            ChatBubble(message: data['message']!)
+            ChatBubble(message: data['message']!),
           ],
         ),
       ),
@@ -121,7 +150,7 @@ class _ChatPageState extends State<ChatPage> {
               Icons.send,
               size: 30,
             ),
-          )
+          ),
         ],
       ),
     );

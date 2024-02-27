@@ -189,7 +189,7 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Future<void> updateProfileImageUrl(String imageUrl) async {
+  Future<void> updateProfileImage(String imageUrl) async {
     try {
       // Update the profile image URL in Firestore
       await FirebaseFirestore.instance
@@ -213,7 +213,7 @@ class _MyProfileState extends State<MyProfile> {
         String imageUrl = await uploadImageToFirebase(pickedFile.path);
 
         // Update the profile image URL in Firestore
-        await updateProfileImageUrl(imageUrl);
+        await updateProfileImage(imageUrl);
 
         // Update the local state based on the new image URL
         setState(() {

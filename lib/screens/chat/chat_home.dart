@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
 
     if (_auth.currentUser!.email != data['email']) {
       return ListTile(
-        title: Text((data)['email']),
+        title: Text((data)['username'] ?? ''),
         onTap: () {
           Navigator.push(
             context,

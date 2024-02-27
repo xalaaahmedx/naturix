@@ -8,7 +8,8 @@ class ChatService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendMessage(String recieverEmail, String message) async {
-    final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
+    final String currentUserEmail =
+        _firebaseAuth.currentUser!.email.toString();
     final Timestamp timestamp = Timestamp.now();
 
     Message newMessage = Message(
@@ -30,7 +31,8 @@ class ChatService extends ChangeNotifier {
         .add(newMessage.toMap());
   }
 
-  Stream<QuerySnapshot> getMessages(String userEmail, String otherUserEmail) {
+  Stream<QuerySnapshot> getMessages(
+      String userEmail, String otherUserEmail) {
     List<String> emails = [userEmail, otherUserEmail];
     emails.sort();
     String chatRoomId = emails.join('_');
