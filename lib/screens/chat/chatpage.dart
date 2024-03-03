@@ -62,8 +62,14 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 78, 27, 111),
-        title: Text(username), // Display username in the app bar title
+        backgroundColor: Color.fromARGB(255, 1, 158, 140),
+        title: Text(username,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'anekMalayalam',
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+            )),
       ),
       body: Column(
         children: [
@@ -121,7 +127,13 @@ class _ChatPageState extends State<ChatPage> {
                   ? CrossAxisAlignment.end
                   : CrossAxisAlignment.start,
           children: [
-            Text(data['senderEmail'] ?? ''),
+            Text(data['senderEmail'] ?? '',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontFamily: 'anekMalayalam',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                )),
             const SizedBox(height: 2),
             ChatBubble(message: data['message']!),
           ],
@@ -132,23 +144,39 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildMessageInput() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.all(8),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: _messageController,
-              decoration: const InputDecoration(
-                hintText: 'Type a message',
-                border: OutlineInputBorder(),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: TextField(
+                controller: _messageController,
+                decoration: const InputDecoration(
+                  hintText: 'Type a message',
+                  border: InputBorder.none,
+                ),
               ),
             ),
           ),
-          IconButton(
-            onPressed: sendMessage,
-            icon: const Icon(
-              Icons.send,
-              size: 30,
+          SizedBox(width: 8),
+          GestureDetector(
+            onTap: sendMessage,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 1, 158, 140),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.send,
+                size: 24,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

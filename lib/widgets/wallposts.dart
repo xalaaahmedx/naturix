@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/screens/my_profile.dart';
 import 'package:naturix/screens/user_profile_screen.dart';
 
 import 'package:naturix/widgets/widgetss/comment.dart';
-
 import 'package:naturix/widgets/widgetss/comment_button.dart';
+
 import 'package:naturix/widgets/widgetss/delete_button.dart';
 import 'package:naturix/widgets/widgetss/like_button.dart';
 import 'package:naturix/helper/helper_methods.dart';
@@ -99,25 +100,6 @@ class _WallPostState extends State<WallPost> {
           content: Text("You can only delete your own posts."),
         ),
       );
-    }
-  }
-
-  void toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-    });
-
-    DocumentReference postRef =
-        FirebaseFirestore.instance.collection('user posts').doc(widget.postId);
-
-    if (isLiked) {
-      postRef.update({
-        'Likes': FieldValue.arrayUnion([currentUser.email])
-      });
-    } else {
-      postRef.update({
-        'Likes': FieldValue.arrayRemove([currentUser.email])
-      });
     }
   }
 
@@ -249,22 +231,52 @@ class _WallPostState extends State<WallPost> {
                   children: [
                     Row(
                       children: [
-                        LikeButton(isLiked: isLiked, onTap: toggleLike),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.likes.length.toString(),
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
+                        if (widget.user != currentUser.email)
+                          GestureDetector(
+                            onTap: () async {
+                              try {
+                                // Fetch the user document from Firestore
+                                DocumentSnapshot userDocument =
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(widget.user)
+                                        .get();
+
+                                // Extract data from the user document
+                                final data =
+                                    userDocument.data() as Map<String, dynamic>;
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                      userEmail: data['email'],
+                                      recieverUserId: data['email'],
+                                    ),
+                                  ),
+                                );
+                              } catch (e) {
+                                print('Error fetching user data: $e');
+                              }
+                            },
+                            child: Image.asset(
+                              'assets/icons/message.png',
+                              width: 30,
+                              height: 30,
+                            ),
                           ),
-                        ),
                         const SizedBox(width: 16),
-                        CommentButton(
+                        GestureDetector(
                           onTap: () {
                             setState(() {
                               showComments = !showComments;
                             });
                           },
+                          child: Image.asset(
+                            'assets/icons/comments.png',
+                            width: 30,
+                            height: 30,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         StreamBuilder(

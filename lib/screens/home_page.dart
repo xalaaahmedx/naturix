@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
-import 'package:naturix/screens/add_post_screen.dart';
+
 import 'package:naturix/screens/my_profile.dart';
 import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/maindrawe.dart';
@@ -217,6 +217,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                         .data() as Map<String, dynamic>;
                                     final imageUrl =
                                         post['ImageUrl'] as String? ?? '';
+
+                                    if (post['UserEmail'] ==
+                                        currentUser?.email) {
+                                      return Container(); // Skip rendering this post
+                                    }
 
                                     return FutureBuilder(
                                       future: FirebaseFirestore.instance

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 
 class CommentBox extends StatefulWidget {
   final Widget image;
@@ -100,4 +100,4 @@ class _CommentBoxState extends State<CommentBox> {
       ),
     );
   }
-}
+}*/

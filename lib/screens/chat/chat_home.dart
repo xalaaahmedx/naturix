@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
-import 'package:naturix/services/auth/auth_sarvice.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,7 +17,16 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Chat',
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'anekMalayalam',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevation: 0,
       ),
       body: _buildUserList(),
     );
@@ -31,16 +37,20 @@ class _HomePageState extends State<HomePage> {
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Something went wrong');
+          return Center(child: Text('Something went wrong'));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
-        return ListView(
-            children: snapshot.data!.docs
-                .map<Widget>((doc) => _buildUserListItem(doc))
-                .toList());
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            return _buildUserListItem(snapshot.data!.docs[index]);
+          },
+        );
       },
     );
   }
@@ -49,19 +59,38 @@ class _HomePageState extends State<HomePage> {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     if (_auth.currentUser!.email != data['email']) {
-      return ListTile(
-        title: Text((data)['username'] ?? ''),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatPage(
-                recieverUserId: data['email'], // Pass email as receiver ID
-                userEmail: data['email'],
-              ),
+      return Card(
+        elevation: 4,
+        margin: EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          contentPadding: EdgeInsets.all(16),
+          leading: CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(data['profileImageUrl'] ?? ''),
+          ),
+          title: Text(
+            data['username'] ?? '',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
-          );
-        },
+          ),
+          trailing: Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                  recieverUserId: data['email'],
+                  userEmail: data['email'],
+                ),
+              ),
+            );
+          },
+        ),
       );
     } else {
       return Container();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
+import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
@@ -273,25 +274,90 @@ class _UserProfileState extends State<UserProfile> {
                         ],
                       ),
                       SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: toggleFollow,
-                        style: ElevatedButton.styleFrom(
-                          primary: isFollowing
-                              ? Colors.grey[200]
-                              : Color.fromARGB(255, 1, 158, 140),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                // Fetch the user document from Firestore
+                                DocumentSnapshot userDocument =
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(widget.useremail)
+                                        .get();
+
+                                // Extract data from the user document
+                                final data =
+                                    userDocument.data() as Map<String, dynamic>;
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                      userEmail: data['email'],
+                                      recieverUserId: data['email'],
+                                    ),
+                                  ),
+                                );
+                              } catch (e) {
+                                print('Error fetching user data: $e');
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.mail, size: 24),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Message',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                        ),
-                        child: Text(
-                          isFollowing ? 'Unfollow' : 'Follow',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: toggleFollow,
+                            style: ElevatedButton.styleFrom(
+                              primary: isFollowing
+                                  ? Colors.grey[200]
+                                  : Color.fromARGB(255, 1, 158, 140),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                    isFollowing
+                                        ? Icons.person_remove
+                                        : Icons.person_add,
+                                    size: 24),
+                                SizedBox(width: 8),
+                                Text(
+                                  isFollowing ? 'Unfollow' : 'Follow',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
