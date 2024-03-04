@@ -24,27 +24,28 @@ class _ChatPageState extends State<ChatPage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final ChatService _chatService = ChatService();
   String username = ''; // Add a variable to store the username
-
+  String receiverUserProfileImageUrl = '';
   @override
   void initState() {
     super.initState();
-    fetchUsername(); // Fetch the username when the widget initializes
+    fetchReceiverUserData(); // Fetch the username when the widget initializes
   }
 
-  void fetchUsername() async {
+  void fetchReceiverUserData() async {
     try {
-      final userDoc = await FirebaseFirestore.instance
+      final receiverUserDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.userEmail)
+          .doc(widget.recieverUserId)
           .get();
 
-      if (userDoc.exists) {
+      if (receiverUserDoc.exists) {
         setState(() {
-          username = userDoc.get('username');
+          username = receiverUserDoc.get('username');
+          receiverUserProfileImageUrl = receiverUserDoc.get('profileImageUrl');
         });
       }
     } catch (e) {
-      print('Error fetching username: $e');
+      print('Error fetching receiver user data: $e');
     }
   }
 
@@ -63,13 +64,26 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 1, 158, 140),
-        title: Text(username,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'anekMalayalam',
-              fontWeight: FontWeight.bold,
-              fontSize: 25,
-            )),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: receiverUserProfileImageUrl.isNotEmpty
+                  ? NetworkImage(receiverUserProfileImageUrl)
+                  : AssetImage('assets/default_profile_image.png')
+                      as ImageProvider<Object>,
+            ),
+            SizedBox(width: 8),
+            Text(
+              username,
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'anekMalayalam',
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -112,28 +126,30 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-    print('Message data: $data');
+
     var alignment = data['senderId'] == _firebaseAuth.currentUser!.email
         ? Alignment.centerRight
         : Alignment.centerLeft;
 
     return Container(
+      margin: const EdgeInsets.symmetric(
+          vertical: 2), // Adjust vertical margin here
       alignment: alignment,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 8), // Keep horizontal padding
         child: Column(
-          crossAxisAlignment:
-              (data['senderId'] == _firebaseAuth.currentUser!.uid)
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(data['senderEmail'] ?? '',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontFamily: 'anekMalayalam',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                )),
+            Text(
+              data['senderEmail'] ?? '',
+              style: TextStyle(
+                color: Colors.grey,
+                fontFamily: 'anekMalayalam',
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
             const SizedBox(height: 2),
             ChatBubble(message: data['message']!),
           ],
