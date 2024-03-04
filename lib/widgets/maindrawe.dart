@@ -39,129 +39,140 @@ class _MainDrawerState extends State<MainDrawer>
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      elevation: 0,
-      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align to start (left)
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: FutureBuilder<DocumentSnapshot>(
-              future: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(currentUser.email)
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
+        elevation: 0,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 1, 158, 140),
+                Color.fromARGB(255, 2, 165, 146),
+                Color.fromARGB(246, 199, 218, 218),
+              ],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentUser.email)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
 
-                if (snapshot.hasError || snapshot.data == null) {
-                  // Handle the error or absence of data, for now, log out the user
-                  signOut();
-                  return Container();
-                }
+                    if (snapshot.hasError || snapshot.data == null) {
+                      // Handle the error or absence of data, for now, log out the user
+                      signOut();
+                      return Container();
+                    }
 
-                final userData =
-                    (snapshot.data! as DocumentSnapshot<Map<String, dynamic>>)
+                    final userData = (snapshot.data!
+                            as DocumentSnapshot<Map<String, dynamic>>)
                         .data();
 
-                if (userData == null) {
-                  // Handle the case when userData is null, for now, log out the user
-                  signOut();
-                  return Container();
-                }
+                    if (userData == null) {
+                      // Handle the case when userData is null, for now, log out the user
+                      signOut();
+                      return Container();
+                    }
 
-                final username = userData['username'] ?? '';
-                final profileImageUrl = userData['profileImageUrl'] ?? '';
+                    final username = userData['username'] ?? '';
+                    final profileImageUrl = userData['profileImageUrl'] ?? '';
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 40, // Increased size of the image
-                      backgroundImage: NetworkImage(profileImageUrl),
-                    ),
-                    SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        username,
-                        style: TextStyle(
-                          fontSize: 18, // Increased font size
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'anekMalayalam',
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 40, // Increased size of the image
+                          backgroundImage: NetworkImage(profileImageUrl),
                         ),
-                      ),
+                        SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            username,
+                            style: TextStyle(
+                              fontSize: 18, // Increased font size
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'anekMalayalam',
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    buildDrawerItem(
+                      icon: Icons.person,
+                      title: 'Profile',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyProfile()),
+                        );
+                      },
+                    ),
+                    buildDrawerItem(
+                      icon: Icons.settings,
+                      title: 'Settings',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsScreen()),
+                        );
+                      },
+                    ),
+                    buildDrawerItem(
+                      icon: Icons.list,
+                      title: 'Your List',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const GroceryList()),
+                        );
+                      },
+                    ),
+                    buildDrawerItem(
+                      icon: Icons.lightbulb,
+                      title: 'Tips',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ToggleScreen()),
+                        );
+                      },
+                    ),
+                    buildDrawerItem(
+                      icon: Icons.kitchen,
+                      title: 'Kitchen',
+                      onTap: () {},
                     ),
                   ],
-                );
-              },
-            ),
+                ),
+              ),
+              buildDrawerItem(
+                icon: Icons.logout,
+                title: 'Logout',
+                onTap: signOut,
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView(
-              children: [
-                buildDrawerItem(
-                  icon: Icons.person,
-                  title: 'Profile',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyProfile()),
-                    );
-                  },
-                ),
-                buildDrawerItem(
-                  icon: Icons.settings,
-                  title: 'Settings',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SettingsScreen()),
-                    );
-                  },
-                ),
-                buildDrawerItem(
-                  icon: Icons.list,
-                  title: 'Your List',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const GroceryList()),
-                    );
-                  },
-                ),
-                buildDrawerItem(
-                  icon: Icons.lightbulb,
-                  title: 'Tips',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ToggleScreen()),
-                    );
-                  },
-                ),
-                buildDrawerItem(
-                  icon: Icons.kitchen,
-                  title: 'Kitchen',
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          buildDrawerItem(
-            icon: Icons.logout,
-            title: 'Logout',
-            onTap: signOut,
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget buildDrawerItem({
