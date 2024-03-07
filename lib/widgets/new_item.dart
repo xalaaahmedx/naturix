@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/data/categories.dart';
 import 'package:naturix/model/category.dart';
 import 'package:naturix/model/grocery_item.dart';
@@ -21,7 +19,10 @@ class _NewItemState extends State<NewItem> {
   var _enteredQuantity = 1;
   var _isSending = false;
 
-  void _saveItem() async {
+  final CollectionReference _groceryItemsCollection =
+      FirebaseFirestore.instance.collection('groceryItems');
+
+  Future<void> _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -29,37 +30,29 @@ class _NewItemState extends State<NewItem> {
         _isSending = true;
       });
 
-      final url = Uri.https(
-        'naturix-e6bf7-default-rtdb.firebaseio.com',
-        'naturix.json',
-      );
+      try {
+        await _groceryItemsCollection.add({
+          'name': _enteredName,
+          'quantity': _enteredQuantity,
+          'category': _selectedCategory.title,
+          'isSelected': false,
+        });
 
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(
-          {
-            'name': _enteredName,
-            'quantity': _enteredQuantity,
-            'category': _selectedCategory.title,
-          },
-        ),
-      );
+        // Reset the form
+        _formKey.currentState!.reset();
 
-      final Map<String, dynamic> resData = json.decode(response.body);
+        setState(() {
+          _isSending = false;
+        });
 
-      if (!context.mounted) {
-        return;
+        Navigator.of(context).pop(); // Close the NewItem screen
+      } catch (e) {
+        // Handle error (display a snackbar, for example)
+        print('Error saving item: $e');
+        setState(() {
+          _isSending = false;
+        });
       }
-
-      Navigator.of(context).pop(GroceryItem(
-        id: resData['name'],
-        name: _enteredName,
-        quantity: _enteredQuantity,
-        category: _selectedCategory,
-      ));
     }
   }
 
@@ -172,7 +165,14 @@ class _NewItemState extends State<NewItem> {
                                           height: 16,
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(category.value.title),
+                                        Text(
+                                          category.value.title,
+                                          style: TextStyle(
+                                            fontFamily: 'anekMalayalam',
+                                            color: Colors
+                                                .black, // Set the text color to black
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   )
@@ -221,19 +221,6 @@ class _NewItemState extends State<NewItem> {
                                 color: Color.fromARGB(255, 255, 255, 255),
                               )),
                     )
-                    /*ElevatedButton(
-                      onPressed: _saveItem,
-                      child: _isSending
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(),
-                            )
-                          : const Text('Add Item',
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 1, 158, 140),
-                              )),
-                    ),*/
                   ],
                 ),
               ],
