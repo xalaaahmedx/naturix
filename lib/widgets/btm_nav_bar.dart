@@ -54,7 +54,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
         onPageChanged: onPageChanged,
         children: [
           HomePageScreen(),
-          Search(),
+          SearchScreen(),
           AddPostScreen(),
           Likes(),
           HomePage(),

@@ -79,15 +79,15 @@ class _HomePageState extends State<HomePage> {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           final participants = data['participants'] as List;
           final lastMessage = data['lastMessage'] as String;
-          final username = data['username'] != null
-              ? data['username'] as String
-              : participants[1];
+
+          // Extract the email of the other participant
+          final otherParticipantEmail = participants
+              .firstWhere((email) => email != _auth.currentUser!.email);
 
           return FutureBuilder<DocumentSnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
-                .doc(participants[
-                    1]) // Assuming participants[1] is the user's email
+                .doc(otherParticipantEmail)
                 .get(),
             builder: (context, userSnapshot) {
               if (userSnapshot.hasError ||
@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage> {
               final userData =
                   userSnapshot.data!.data() as Map<String, dynamic>;
               final profileImageUrl = userData['profileImageUrl'] as String?;
+              final username = userData['username'] as String;
 
               return ListTile(
                 title: Text(
@@ -124,8 +125,8 @@ class _HomePageState extends State<HomePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ChatPage(
-                        recieverUserId: participants[0],
-                        userEmail: participants[1],
+                        recieverUserId: otherParticipantEmail,
+                        userEmail: _auth.currentUser!.email!,
                       ),
                     ),
                   );
