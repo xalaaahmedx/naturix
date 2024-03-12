@@ -131,7 +131,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SettingsScreen()),
+                              builder: (context) =>  SettingsScreen()),
                         );
                       },
                     ),
@@ -142,7 +142,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const GroceryList()),
+                              builder: (context) =>  GroceryList()),
                         );
                       },
                     ),
@@ -153,7 +153,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const ToggleScreen()),
+                              builder: (context) =>  ToggleScreen()),
                         );
                       },
                     ),
