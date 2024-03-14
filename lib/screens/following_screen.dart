@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:naturix/screens/user_profile_screen.dart';
 
 class FollowingScreen extends StatelessWidget {
   final currentUser = FirebaseAuth.instance.currentUser;
@@ -53,12 +54,12 @@ class FollowingScreen extends StatelessWidget {
                         builder: (context, userSnapshot) {
                           if (userSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return Center(child: CircularProgressIndicator());
                           } else if (userSnapshot.hasError) {
                             return Text('Error: ${userSnapshot.error}');
                           } else if (!userSnapshot.hasData ||
                               !userSnapshot.data!.exists) {
-                            return Text('User data not available');
+                            return SizedBox(); // Return an empty container
                           } else {
                             final userData = userSnapshot.data!.data()
                                 as Map<String, dynamic>;
@@ -70,13 +71,64 @@ class FollowingScreen extends StatelessWidget {
                               print('Followed email is null');
                             }
 
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    userData['profileImageUrl'] ?? ''),
+                            return Card(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Navigate to user profile
+                                        // You can implement the navigation logic here
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => UserProfile(
+                                              currentUserEmail: currentUser
+                                                      ?.email ??
+                                                  '', // Providing a default value
+                                              useremail: followedEmail ?? '',
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                            userData['profileImageUrl'] ?? ''),
+                                      ),
+                                    ),
+                                    SizedBox(width: 16.0),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            userData['username'] ?? '',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            userData['bio'] ?? '',
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              title: Text(userData['username'] ?? ''),
-                              subtitle: Text(userData['bio'] ?? ''),
                             );
                           }
                         },
@@ -96,10 +148,8 @@ class FollowingScreen extends StatelessWidget {
     try {
       final userDocs = await FirebaseFirestore.instance
           .collection('users')
-          .where('email', isEqualTo: followedEmail)
-          .limit(1)
-          .get()
-          .then((value) => value.docs.first);
+          .doc(followedEmail)
+          .get();
       if (!userDocs.exists || !userDocs.data()!.containsKey('email')) {
         // Add the email field to the user document
         await FirebaseFirestore.instance
