@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/screens/edit_profile.dart';
+import 'package:naturix/screens/followers.dart';
+import 'package:naturix/screens/following_screen.dart';
 import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/text_box.dart';
@@ -408,12 +410,20 @@ class _MyProfileState extends State<MyProfile> {
                                 ),
                                 Column(
                                   children: [
-                                    Text(
-                                      '$followersCount',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FollowersScreen(),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '$followersCount',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -426,12 +436,20 @@ class _MyProfileState extends State<MyProfile> {
                                 ),
                                 Column(
                                   children: [
-                                    Text(
-                                      '$followingCount',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FollowingScreen(),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '$followingCount',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     Text(
