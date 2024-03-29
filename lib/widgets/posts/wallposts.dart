@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
-import 'package:naturix/screens/my_profile.dart';
 import 'package:naturix/screens/user_profile_screen.dart';
-
+import 'package:naturix/widgets/posts/edit_post.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
-import 'package:naturix/widgets/widgetss/comment_button.dart';
-
-import 'package:naturix/widgets/widgetss/delete_button.dart';
-import 'package:naturix/widgets/widgetss/like_button.dart';
 import 'package:naturix/helper/helper_methods.dart';
 
 class WallPost extends StatefulWidget {
@@ -103,6 +98,43 @@ class _WallPostState extends State<WallPost> {
     }
   }
 
+  void addToFavorites() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser!;
+      final postRef = FirebaseFirestore.instance
+          .collection('user posts')
+          .doc(widget.postId);
+
+      // Fetch the post document
+      DocumentSnapshot postSnapshot = await postRef.get();
+
+      // Get the current list of likes
+      List<dynamic> likes = List.from(postSnapshot['Likes']);
+
+      // Check if the current user already liked the post
+      if (!likes.contains(currentUser.email)) {
+        // Add the current user to the list of likes
+        likes.add(currentUser.email);
+
+        // Update the list of likes in Firestore
+        await postRef.update({'Likes': likes});
+
+        // Show a confirmation message or handle success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Added to favorites')),
+        );
+      } else {
+        // Show a message indicating that the post is already in favorites
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Post already in favorites')),
+        );
+      }
+    } catch (e) {
+      print('Error adding to favorites: $e');
+      // Show an error message or handle the error
+    }
+  }
+
   void addComment(String comment) {
     FirebaseFirestore.instance
         .collection('user posts')
@@ -191,14 +223,42 @@ class _WallPostState extends State<WallPost> {
                         ],
                       ),
                     ),
-                    if (widget.user == currentUser.email)
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.red,
+                    PopupMenuButton(
+                      icon: Icon(Icons.more_vert),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: Text('Delete'),
+                          value: 'delete',
                         ),
-                        onPressed: () => deletePost(),
-                      ),
+                        PopupMenuItem(
+                          child: Text('Update'),
+                          value: 'update',
+                        ),
+                        PopupMenuItem(
+                          child: Text('Add to Favorites'),
+                          value: 'favorites',
+                        ),
+                      ],
+                      onSelected: (String value) {
+                        switch (value) {
+                          case 'delete':
+                            deletePost();
+                            break;
+                          case 'update':
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditPostScreen(postId: widget.postId),
+                              ),
+                            );
+                            break;
+                          case 'favorites':
+                            addToFavorites();
+                            break;
+                        }
+                      },
+                    )
                   ],
                 ),
               ),

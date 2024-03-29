@@ -10,7 +10,7 @@ import 'package:naturix/screens/edit_profile.dart';
 
 import 'package:naturix/widgets/PROFILE/profile_body.dart';
 import 'package:naturix/widgets/PROFILE/profile_header_widget.dart';
-import 'package:naturix/widgets/wallposts.dart';
+import 'package:naturix/widgets/posts/wallposts.dart';
 
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/text_box.dart';

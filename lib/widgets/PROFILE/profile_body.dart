@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
-import 'package:naturix/widgets/wallposts.dart';
+import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
 class ProfileBodyWidget extends StatelessWidget {

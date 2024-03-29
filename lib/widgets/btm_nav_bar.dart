@@ -6,7 +6,7 @@ import 'package:naturix/screens/chat/chat_home.dart';
 
 import 'package:naturix/screens/home_page.dart';
 
-import 'package:naturix/screens/likes.dart';
+import 'package:naturix/screens/favourites.dart';
 import 'package:naturix/screens/search.dart';
 
 class BtmNavBar extends StatefulWidget {
@@ -56,7 +56,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
           HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
-          Likes(),
+          FavoritesScreen(),
           HomePage(),
         ],
       ),

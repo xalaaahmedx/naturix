@@ -4,7 +4,7 @@ import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/widgets/PROFILE/user_profile_header.dart';
 
 import 'package:naturix/helper/helper_methods.dart';
-import 'package:naturix/widgets/wallposts.dart';
+import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
 class UserProfile extends StatefulWidget {

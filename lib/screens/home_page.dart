@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
 
 import 'package:naturix/screens/my_profile.dart';
-import 'package:naturix/widgets/wallposts.dart';
+import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/maindrawe.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
