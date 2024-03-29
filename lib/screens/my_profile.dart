@@ -7,9 +7,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/screens/edit_profile.dart';
-import 'package:naturix/screens/followers.dart';
-import 'package:naturix/screens/following_screen.dart';
+
+import 'package:naturix/widgets/PROFILE/profile_body.dart';
+import 'package:naturix/widgets/PROFILE/profile_header_widget.dart';
 import 'package:naturix/widgets/wallposts.dart';
+
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/text_box.dart';
 
@@ -30,6 +32,31 @@ class _MyProfileState extends State<MyProfile> {
   late int followersCount = 0;
   late int followingCount = 0;
   late int postsCount = 0;
+  late Map<String, dynamic> userData = {};
+
+  Future<void> fetchUserData(String userEmail) async {
+    try {
+      final userDoc = await userCollection.doc(userEmail).get();
+      if (userDoc.exists) {
+        setState(() {
+          userData = userDoc.data() as Map<String, dynamic>;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (currentUser != null) {
+      String userEmail = currentUser?.email ?? '';
+      fetchUserCounts(userEmail);
+      checkAndAddEmailField(userEmail);
+      fetchUserData(userEmail);
+    }
+  }
 
   Future<int> fetchPostsCount(String userEmail) async {
     try {
@@ -58,16 +85,6 @@ class _MyProfileState extends State<MyProfile> {
       });
     } catch (e) {
       print('Error fetching user counts: $e');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (currentUser != null) {
-      String userEmail = currentUser?.email ?? '';
-      fetchUserCounts(userEmail);
-      checkAndAddEmailField(userEmail);
     }
   }
 
@@ -283,7 +300,6 @@ class _MyProfileState extends State<MyProfile> {
       body: StreamBuilder<DocumentSnapshot>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final userData = snapshot.data!.data() as Map<String, dynamic>;
             return FutureBuilder<QuerySnapshot>(
               future: userPostsCollection
                   .where('UserEmail', isEqualTo: currentUser?.email)
@@ -300,199 +316,24 @@ class _MyProfileState extends State<MyProfile> {
                   final userPosts = userPostsSnapshot.data!.docs;
                   return Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(255, 1, 158, 140),
-                              Color.fromARGB(255, 0, 109, 97),
-                            ], // Customize the gradient colors
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: _changeProfilePicture,
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 4,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 200,
-                                      backgroundColor: Colors.white,
-                                      backgroundImage: userData[
-                                                  'profileImageUrl'] !=
-                                              null
-                                          ? Image.network(
-                                                  userData['profileImageUrl']!)
-                                              .image
-                                          : AssetImage('assets/images/bear.png')
-                                              as ImageProvider,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 8,
-                                    right: 8,
-                                    child: Container(
-                                      padding: EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white,
-                                      ),
-                                      child: Icon(
-                                        Icons.edit,
-                                        size: 16,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              userData['username'] ?? '',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              userData['bio'] ?? '',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      '$postsCount',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Posts',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              FollowersScreen(),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '$followersCount',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Followers',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              FollowingScreen(),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '$followingCount',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Following',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      ProfileHeaderWidget(
+                        userData: userData,
+                        followersCount: followersCount,
+                        followingCount: followingCount,
+                        postsCount: postsCount,
+                        onEditProfile: () {
+                          _editField({
+                            'username': '',
+                            'bio': '',
+                          });
+                        },
+                        onChangeProfilePicture: _changeProfilePicture,
                       ),
+                      SizedBox(height: 20),
                       Expanded(
-                        child: ListView(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          children: [
-                            Divider(),
-                            for (final post in userPosts)
-                              Column(
-                                children: [
-                                  WallPost(
-                                    userProfileImageUrl:
-                                        userData['profileImageUrl']
-                                                as String? ??
-                                            '',
-                                    messages: post['Message'],
-                                    user: post['UserEmail'],
-                                    postId: post.id,
-                                    likes:
-                                        List<String>.from(post['Likes'] ?? []),
-                                    time: formatData(post['TimeStamp']),
-                                    imageUrl: (post.data() as Map<String,
-                                            dynamic>)['ImageUrl'] as String? ??
-                                        '',
-                                    commentsFuture: fetchComments(post.id),
-                                  ),
-                                  Divider(),
-                                ],
-                              ),
-                          ],
+                        child: ProfileBodyWidget(
+                          userPosts: userPosts,
+                          userData: userData,
                         ),
                       ),
                     ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
+import 'package:naturix/widgets/PROFILE/user_profile_header.dart';
+
+import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
@@ -174,193 +176,39 @@ class _UserProfileState extends State<UserProfile> {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
             return Column(
               children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 1, 158, 140),
-                        Color.fromARGB(255, 0, 109, 97),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 24),
-                      GestureDetector(
-                        onTap: () {
-                          // Implement the image change functionality if needed
-                        },
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            userData['profileImageUrl'] ??
-                                'https://example.com/default-profile-image.jpg',
-                          ),
-                          radius: 50,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        userData['username'] ?? '',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        bio,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                '$postsCount',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                'Posts',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                '$followersCount',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                'Followers',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                '$followingCount',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                'Following',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                // Fetch the user document from Firestore
-                                DocumentSnapshot userDocument =
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(widget.useremail)
-                                        .get();
+                UserProfileHeader(
+                  userData: userData,
+                  bio: bio,
+                  postsCount: postsCount,
+                  followersCount: followersCount,
+                  followingCount: followingCount,
+                  isFollowing: isFollowing,
+                  toggleFollow: toggleFollow,
+                  messageUser: () async {
+                    try {
+                      // Fetch the user document from Firestore
+                      DocumentSnapshot userDocument = await FirebaseFirestore
+                          .instance
+                          .collection('users')
+                          .doc(widget.useremail)
+                          .get();
 
-                                // Extract data from the user document
-                                final data =
-                                    userDocument.data() as Map<String, dynamic>;
+                      // Extract data from the user document
+                      final data = userDocument.data() as Map<String, dynamic>;
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatPage(
-                                      userEmail: data['email'],
-                                      recieverUserId: data['email'],
-                                    ),
-                                  ),
-                                );
-                              } catch (e) {
-                                print('Error fetching user data: $e');
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.grey[200],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.mail, size: 24),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Message',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            userEmail: data['email'],
+                            recieverUserId: data['email'],
                           ),
-                          SizedBox(width: 16),
-                          ElevatedButton(
-                            onPressed: toggleFollow,
-                            style: ElevatedButton.styleFrom(
-                              primary: isFollowing
-                                  ? Colors.grey[200]
-                                  : Color.fromARGB(255, 1, 158, 140),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                    isFollowing
-                                        ? Icons.person_remove
-                                        : Icons.person_add,
-                                    size: 24),
-                                SizedBox(width: 8),
-                                Text(
-                                  isFollowing ? 'Unfollow' : 'Follow',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      );
+                    } catch (e) {
+                      print('Error fetching user data: $e');
+                    }
+                  },
                 ),
                 Divider(),
                 SizedBox(height: 16),
