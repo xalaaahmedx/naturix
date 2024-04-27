@@ -319,13 +319,13 @@ class _WallPostState extends State<WallPost> {
               ),
               if (widget.imageUrl.isNotEmpty)
                 Container(
-                  height: 200,
+                  height: 300,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: NetworkImage(
                         widget.imageUrl,
                       ),
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
