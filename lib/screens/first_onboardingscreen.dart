@@ -4,7 +4,6 @@ import 'package:naturix/intro_screens/intro_page_3.dart';
 import 'package:naturix/intro_screens/intro_page_4.dart';
 import 'package:naturix/intro_screens/intropage_1.dart';
 
-import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/widgets/btm_nav_bar.dart';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

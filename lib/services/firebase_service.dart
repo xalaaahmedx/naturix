@@ -9,7 +9,7 @@ class FirebaseService {
       QuerySnapshot userDocs = await users
           .where('username', isGreaterThanOrEqualTo: query.toLowerCase())
           .where('username',
-              isLessThanOrEqualTo: query.toLowerCase() + '\uf8ff')
+              isLessThanOrEqualTo: '${query.toLowerCase()}\uf8ff')
           .get();
 
       if (userDocs.docs.isNotEmpty) {

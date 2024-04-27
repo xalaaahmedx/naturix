@@ -8,7 +8,7 @@ class Comments extends StatelessWidget {
   final String? imageUrl;
   final String? username; // Add this line
 
-  Comments({
+  const Comments({super.key, 
     required this.userProfileImageUrl,
     required this.text,
     required this.user,
@@ -32,7 +32,7 @@ class Comments extends StatelessWidget {
             Text(
               username ??
                   user, // Use username if available, otherwise use user email
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -42,14 +42,14 @@ class Comments extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           time,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.grey,
             fontSize: 12,
           ),

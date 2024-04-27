@@ -7,13 +7,15 @@ import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen>
     with TickerProviderStateMixin {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   late TabController _tabController;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,14 +46,14 @@ class _SearchScreenState extends State<SearchScreen>
     return Scaffold(
       appBar: AppBar(
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48.0),
+          preferredSize: const Size.fromHeight(48.0),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search...',
-                hintStyle: TextStyle(fontFamily: 'anekMalayalam'),
+                hintStyle: const TextStyle(fontFamily: 'anekMalayalam'),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -59,7 +61,7 @@ class _SearchScreenState extends State<SearchScreen>
                   borderSide: BorderSide.none,
                 ),
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
                   },
@@ -73,7 +75,7 @@ class _SearchScreenState extends State<SearchScreen>
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
               // Add filter functionality if needed
             },
@@ -84,14 +86,14 @@ class _SearchScreenState extends State<SearchScreen>
         children: [
           TabBar(
             controller: _tabController,
-            tabs: [
+            tabs: const [
               Tab(text: 'Users'),
               Tab(text: 'Posts'),
             ],
-            labelColor: Color.fromARGB(255, 1, 158, 140),
+            labelColor: const Color.fromARGB(255, 1, 158, 140),
             unselectedLabelColor: Colors.grey,
             indicatorSize: TabBarIndicatorSize.label,
-            indicatorColor: Color.fromARGB(255, 1, 158, 140),
+            indicatorColor: const Color.fromARGB(255, 1, 158, 140),
           ),
           Expanded(
             child: TabBarView(
@@ -112,14 +114,14 @@ class _SearchScreenState extends State<SearchScreen>
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, userSnapshot) {
         if (!userSnapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
         final users = userSnapshot.data!.docs;
         List<Map<String, dynamic>> usersSearchResults =
-            users.map((doc) => doc.data() as Map<String, dynamic>).toList();
+            users.map((doc) => doc.data()).toList();
 
         if (_searchController.text.isNotEmpty) {
           // If there is a search query, filter the users
@@ -158,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen>
           .snapshots(),
       builder: (context, postSnapshot) {
         if (!postSnapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -195,7 +197,7 @@ class _SearchScreenState extends State<SearchScreen>
 
   Widget _buildUserResult(Map<String, dynamic> user) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       leading: CircleAvatar(
         backgroundImage: NetworkImage(user['profileImageUrl'] ?? ''),
       ),

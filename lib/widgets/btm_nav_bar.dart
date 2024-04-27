@@ -1,7 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/add_post_screen.dart';
-import 'package:naturix/screens/chat.dart';
 import 'package:naturix/screens/chat/chat_home.dart';
 
 import 'package:naturix/screens/home_page.dart';
@@ -52,7 +51,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
-        children: [
+        children: const [
           HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
@@ -62,12 +61,12 @@ class _BtmNavBarState extends State<BtmNavBar> {
       ),
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.grey[100]!,
-        color: Color.fromARGB(255, 1, 158, 140),
+        color: const Color.fromARGB(255, 1, 158, 140),
         items: const [
           Icon(Icons.home, color: Color.fromARGB(255, 255, 255, 255)),
           Icon(Icons.search, color: Colors.white),
           Icon(Icons.add_circle, color: Colors.white),
-          Icon(Icons.favorite, color: Colors.white),
+          Icon(Icons.star, color: Colors.white),
           Icon(Icons.chat, color: Colors.white),
         ],
         onTap: navigationTapped,

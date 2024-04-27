@@ -50,7 +50,7 @@ class _WallPostState extends State<WallPost> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Delete Post'),
+          title: const Text('Delete Post'),
           content: const Text('Are you sure you want to delete this post?'),
           actions: [
             TextButton(
@@ -91,7 +91,7 @@ class _WallPostState extends State<WallPost> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("You can only delete your own posts."),
         ),
       );
@@ -121,12 +121,12 @@ class _WallPostState extends State<WallPost> {
 
         // Show a confirmation message or handle success
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Added to favorites')),
+          const SnackBar(content: Text('Added to favorites')),
         );
       } else {
         // Show a message indicating that the post is already in favorites
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Post already in favorites')),
+          const SnackBar(content: Text('Post already in favorites')),
         );
       }
     } catch (e) {
@@ -206,7 +206,7 @@ class _WallPostState extends State<WallPost> {
 
                               return Text(
                                 username,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -223,20 +223,62 @@ class _WallPostState extends State<WallPost> {
                         ],
                       ),
                     ),
-                    PopupMenuButton(
-                      icon: Icon(Icons.more_vert),
+                    PopupMenuButton<String>(
+                      icon: widget.user == currentUser.email
+                          ? Icon(Icons.more_vert, color: Colors.grey)
+                          : Icon(
+                              isLiked ? Icons.star : Icons.star_border,
+                              color: Colors.amber,
+                            ),
                       itemBuilder: (context) => [
-                        PopupMenuItem(
-                          child: Text('Delete'),
-                          value: 'delete',
-                        ),
-                        PopupMenuItem(
-                          child: Text('Update'),
-                          value: 'update',
-                        ),
-                        PopupMenuItem(
-                          child: Text('Add to Favorites'),
+                        if (widget.user == currentUser.email)
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Delete',
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        if (widget.user == currentUser.email)
+                          PopupMenuItem<String>(
+                            value: 'update',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.edit,
+                                  color: Color.fromARGB(255, 1, 158, 140),
+                                ),
+                                SizedBox(width: 8),
+                                Text('Update',
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 1, 158, 140),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        PopupMenuItem<String>(
                           value: 'favorites',
+                          child: Row(
+                            children: [
+                              Icon(
+                                isLiked ? Icons.star : Icons.star_border,
+                                color: Color.fromARGB(255, 1, 158, 140),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                isLiked
+                                    ? 'Remove from Favorites'
+                                    : 'Add to Favorites',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 1, 158, 140),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                       onSelected: (String value) {
@@ -248,8 +290,11 @@ class _WallPostState extends State<WallPost> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    EditPostScreen(postId: widget.postId),
+                                builder: (context) => EditPostScreen(
+                                  postId: widget.postId,
+                                  initialMessage: widget.messages,
+                                  initialImageUrl: widget.imageUrl,
+                                ),
                               ),
                             );
                             break;
@@ -280,7 +325,7 @@ class _WallPostState extends State<WallPost> {
                       image: NetworkImage(
                         widget.imageUrl,
                       ),
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
@@ -357,7 +402,7 @@ class _WallPostState extends State<WallPost> {
                             }
                             return Text(
                               snapshot.data!.docs.length.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 14,
                               ),
@@ -436,7 +481,8 @@ class _WallPostState extends State<WallPost> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send, color: Color.fromARGB(255, 1, 158, 140)),
+            icon:
+                const Icon(Icons.send, color: Color.fromARGB(255, 1, 158, 140)),
             onPressed: () {
               if (commentController.text.isNotEmpty) {
                 addComment(commentController.text);

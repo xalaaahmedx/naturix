@@ -20,7 +20,7 @@ class CachedImage extends StatelessWidget {
               child: Center(
                 child: CircularProgressIndicator(
                   value: progress.progress,
-                  color: Color.fromARGB(255, 1, 158, 140),
+                  color: const Color.fromARGB(255, 1, 158, 140),
                 ),
               ),
             ),

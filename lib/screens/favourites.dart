@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:naturix/screens/chat/chatpage.dart';
-import 'package:naturix/screens/user_profile_screen.dart';
 import 'package:naturix/widgets/posts/wallposts.dart'; // Import WallPost widget
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/helper/helper_methods.dart';
 
 class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({super.key});
+
   @override
   _FavoritesScreenState createState() => _FavoritesScreenState();
 }
@@ -61,7 +61,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorites'),
+        title: const Text('Favorites'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -70,7 +70,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -78,7 +78,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           }
 
           if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No favorite posts'));
+            return const Center(child: Text('No favorite posts'));
           }
 
           return Padding(
@@ -90,7 +90,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       snapshot.data!.docs[index].data() as Map<String, dynamic>;
                   final imageUrl = post['ImageUrl'] as String? ?? '';
 
-                  if (post['UserEmail'] == currentUser?.email) {
+                  if (post['UserEmail'] == currentUser.email) {
                     return Container(); // Skip rendering this post
                   }
 
@@ -103,7 +103,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       if (userSnapshot.connectionState ==
                               ConnectionState.waiting ||
                           !userSnapshot.hasData) {
-                        return Center(
+                        return const Center(
                           child: CircularProgressIndicator(
                             // Modernizing the circular progress indicator
                             valueColor: AlwaysStoppedAnimation<Color>(
@@ -127,7 +127,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           if (commentSnapshot.connectionState ==
                                   ConnectionState.waiting ||
                               !commentSnapshot.hasData) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(
                                 // Modernizing the circular progress indicator
                                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -140,7 +140,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           final comments =
                               commentSnapshot.data!.docs.map<Comments>((doc) {
                             final commentData =
-                                doc.data() as Map<String, dynamic>;
+                                doc.data();
                             return Comments(
                               userProfileImageUrl:
                                   userData['profileImageUrl'] as String? ?? '',

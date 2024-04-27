@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,7 +14,7 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
-  CollectionReference _groceryItemsCollection =
+  final CollectionReference _groceryItemsCollection =
       FirebaseFirestore.instance.collection('groceryItems');
 
   late Stream<List<GroceryItem>> _groceryItemsStream;

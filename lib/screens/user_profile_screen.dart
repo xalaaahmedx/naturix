@@ -38,7 +38,7 @@ class _UserProfileState extends State<UserProfile> {
           .get();
 
       return querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return Comments(
           userProfileImageUrl: data['UserProfileImageUrl'],
           text: data['CommentText'],
@@ -168,7 +168,7 @@ class _UserProfileState extends State<UserProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 1, 158, 140),
+        backgroundColor: const Color.fromARGB(255, 1, 158, 140),
       ),
       body: StreamBuilder<DocumentSnapshot>(
         builder: (context, snapshot) {
@@ -210,10 +210,10 @@ class _UserProfileState extends State<UserProfile> {
                     }
                   },
                 ),
-                Divider(),
-                SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(10),
+                const Divider(),
+                const SizedBox(height: 16),
+                const Padding(
+                  padding: EdgeInsets.all(10),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -238,7 +238,7 @@ class _UserProfileState extends State<UserProfile> {
                                 posts[index].data() as Map<String, dynamic>;
 
                             return Card(
-                              margin: EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
                               elevation: 2,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -264,7 +264,7 @@ class _UserProfileState extends State<UserProfile> {
                           child: Text('Error: ${snapshot.error}'),
                         );
                       }
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(),
                       );
                     },
@@ -281,7 +281,7 @@ class _UserProfileState extends State<UserProfile> {
               child: Text('Error: ${snapshot.error}'),
             );
           }
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         },

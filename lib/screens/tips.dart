@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:naturix/screens/chat.dart';
-import 'package:naturix/screens/home_page.dart';
 
 
 import 'package:naturix/widgets/tipcard.dart';
@@ -17,7 +15,7 @@ class FoodWasteTipsScreen extends StatefulWidget {
 class _FoodWasteTipsScreenState extends State<FoodWasteTipsScreen> {
   List<SwipeItem> _tipCards = [];
   late MatchEngine _matchEngine;
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
   bool _finished = false;
 
   @override

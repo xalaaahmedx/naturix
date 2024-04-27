@@ -37,7 +37,7 @@ class _ChatState extends State<Chat> {
             onPressed: () {
               // Handle the post action here
             },
-            child: Text(
+            child: const Text(
               'Post',
               style: TextStyle(
                 color: Color.fromARGB(255, 1, 158, 140),
@@ -48,7 +48,7 @@ class _ChatState extends State<Chat> {
           ),
         ],
       ),
-      body: Placeholder(),
+      body: const Placeholder(),
     );
   }
 }

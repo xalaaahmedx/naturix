@@ -29,7 +29,7 @@ class UserTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundColor: Colors.blue,
               child: Icon(Icons.person, color: Colors.white),
             ),
@@ -42,7 +42,7 @@ class UserTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Icon(Icons.arrow_forward_ios, color: Colors.grey),
+            const Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ],
         ),
       ),

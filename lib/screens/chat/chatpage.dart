@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:naturix/model/message.dart';
 import 'package:naturix/services/chat_service/chat_service.dart';
 import 'package:naturix/widgets/chat/chat_bubble.dart';
 
@@ -63,19 +62,19 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 1, 158, 140),
+        backgroundColor: const Color.fromARGB(255, 1, 158, 140),
         title: Row(
           children: [
             CircleAvatar(
               backgroundImage: receiverUserProfileImageUrl.isNotEmpty
                   ? NetworkImage(receiverUserProfileImageUrl)
-                  : AssetImage('assets/default_profile_image.png')
+                  : const AssetImage('assets/default_profile_image.png')
                       as ImageProvider<Object>,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               username,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontFamily: 'anekMalayalam',
                 fontWeight: FontWeight.bold,
@@ -143,7 +142,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Text(
               data['senderEmail'] ?? '',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.grey,
                 fontFamily: 'anekMalayalam',
                 fontWeight: FontWeight.bold,
@@ -179,12 +178,12 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: sendMessage,
             child: Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color.fromARGB(255, 1, 158, 140),
                 shape: BoxShape.circle,
               ),

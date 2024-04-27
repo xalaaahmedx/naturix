@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
 
-import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
 class UserPosts extends StatelessWidget {
   final List<DocumentSnapshot> posts;
   final Map<String, dynamic> userData;
 
-  const UserPosts({
+  const UserPosts({super.key, 
     required this.posts,
     required this.userData,
   });
@@ -48,7 +47,7 @@ class UserPosts extends StatelessWidget {
           final post = posts[index].data() as Map<String, dynamic>;
 
           return Card(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             elevation: 2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -66,59 +65,59 @@ class UserPosts extends StatelessWidget {
                           userData['profileImageUrl'] as String? ?? '',
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         userData['username'] as String? ?? '',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     post['Message'] as String? ?? '',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   if (post['ImageUrl'] != null)
                     Image.network(
                       post['ImageUrl'] as String? ?? '',
                       height: 200,
                       fit: BoxFit.cover,
                     ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.favorite),
-                      SizedBox(width: 4),
+                      const Icon(Icons.favorite),
+                      const SizedBox(width: 4),
                       Text(
                         '${List<String>.from(post['Likes'] ?? []).length}',
                       ),
-                      SizedBox(width: 16),
-                      Icon(Icons.comment),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 16),
+                      const Icon(Icons.comment),
+                      const SizedBox(width: 4),
                       FutureBuilder<List<Comments>>(
                         future: fetchComments(posts[index].id),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Text('Loading...');
+                            return const Text('Loading...');
                           }
                           if (snapshot.hasData) {
                             return Text('${snapshot.data!.length}');
                           }
-                          return Text('0');
+                          return const Text('0');
                         },
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     formatData(post['TimeStamp']),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.grey,
                     ),
                   ),

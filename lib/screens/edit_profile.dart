@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> fields;
 
-  EditProfile({required this.fields});
+  const EditProfile({super.key, required this.fields});
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -32,13 +31,13 @@ class _EditProfileState extends State<EditProfile> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0, // Remove app bar shadow
-        title: Text(
+        title: const Text(
           'Edit Profile',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.save, color: Colors.black),
+            icon: const Icon(Icons.save, color: Colors.black),
             onPressed: () {
               Map<String, dynamic> updatedValues = {};
 
@@ -66,12 +65,12 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: InputDecoration(
                       labelText: 'Enter new ${entry.key}',
                       labelStyle:
-                          TextStyle(color: Color.fromARGB(255, 1, 158, 140)),
-                      focusedBorder: OutlineInputBorder(
+                          const TextStyle(color: Color.fromARGB(255, 1, 158, 140)),
+                      focusedBorder: const OutlineInputBorder(
                         borderSide:
                             BorderSide(color: Color.fromARGB(255, 1, 158, 140)),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                      enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey),
                       ),
                     ),

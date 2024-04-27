@@ -1,4 +1,3 @@
-import 'package:date_format/date_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,7 +40,7 @@ class _MainDrawerState extends State<MainDrawer>
     return Drawer(
         elevation: 0,
         child: DecoratedBox(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 1, 158, 140),
@@ -64,7 +63,7 @@ class _MainDrawerState extends State<MainDrawer>
                       .get(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     }
 
                     if (snapshot.hasError || snapshot.data == null) {
@@ -93,12 +92,12 @@ class _MainDrawerState extends State<MainDrawer>
                           radius: 40, // Increased size of the image
                           backgroundImage: NetworkImage(profileImageUrl),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.center,
                           child: Text(
                             username,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18, // Increased font size
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -120,7 +119,7 @@ class _MainDrawerState extends State<MainDrawer>
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MyProfile()),
+                          MaterialPageRoute(builder: (context) => const MyProfile()),
                         );
                       },
                     ),
@@ -131,7 +130,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SettingsScreen()),
+                              builder: (context) => const SettingsScreen()),
                         );
                       },
                     ),
@@ -142,7 +141,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => GroceryList()),
+                              builder: (context) => const GroceryList()),
                         );
                       },
                     ),
@@ -153,7 +152,7 @@ class _MainDrawerState extends State<MainDrawer>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ToggleScreen()),
+                              builder: (context) => const ToggleScreen()),
                         );
                       },
                     ),

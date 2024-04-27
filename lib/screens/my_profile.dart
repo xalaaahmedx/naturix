@@ -10,10 +10,8 @@ import 'package:naturix/screens/edit_profile.dart';
 
 import 'package:naturix/widgets/PROFILE/profile_body.dart';
 import 'package:naturix/widgets/PROFILE/profile_header_widget.dart';
-import 'package:naturix/widgets/posts/wallposts.dart';
 
 import 'package:naturix/widgets/widgetss/comment.dart';
-import 'package:naturix/widgets/widgetss/text_box.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
@@ -28,7 +26,7 @@ class _MyProfileState extends State<MyProfile> {
   final userPostsCollection =
       FirebaseFirestore.instance.collection('user posts');
   final ImagePicker _imagePicker = ImagePicker();
-  late File _selectedImage = File('');
+  late final File _selectedImage = File('');
   late int followersCount = 0;
   late int followingCount = 0;
   late int postsCount = 0;
@@ -147,7 +145,7 @@ class _MyProfileState extends State<MyProfile> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Profile updated successfully'),
             duration: Duration(seconds: 2),
           ),
@@ -155,7 +153,7 @@ class _MyProfileState extends State<MyProfile> {
       } catch (e) {
         print('Error updating profile: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Error updating profile. Please try again.'),
             duration: Duration(seconds: 2),
           ),
@@ -244,7 +242,7 @@ class _MyProfileState extends State<MyProfile> {
 
         // Show a success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Profile picture updated successfully'),
             duration: Duration(seconds: 2),
           ),
@@ -254,7 +252,7 @@ class _MyProfileState extends State<MyProfile> {
       print('Error changing profile picture: $e');
       // Show an error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error changing profile picture. Please try again.'),
           duration: Duration(seconds: 2),
         ),
@@ -284,10 +282,10 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 1, 158, 140),
+        backgroundColor: const Color.fromARGB(255, 1, 158, 140),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit, color: Colors.black),
+            icon: const Icon(Icons.edit, color: Colors.black),
             onPressed: () {
               _editField({
                 'username': '',
@@ -307,7 +305,7 @@ class _MyProfileState extends State<MyProfile> {
               builder: (context, userPostsSnapshot) {
                 if (userPostsSnapshot.connectionState ==
                     ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (userPostsSnapshot.hasError) {
                   return Center(
                     child: Text('Error: ${userPostsSnapshot.error}'),
@@ -329,7 +327,7 @@ class _MyProfileState extends State<MyProfile> {
                         },
                         onChangeProfilePicture: _changeProfilePicture,
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Expanded(
                         child: ProfileBodyWidget(
                           userPosts: userPosts,
@@ -346,7 +344,7 @@ class _MyProfileState extends State<MyProfile> {
               child: Text('Error: ${snapshot.error}'),
             );
           }
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         },

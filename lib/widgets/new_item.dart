@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/data/categories.dart';
 import 'package:naturix/model/category.dart';
-import 'package:naturix/model/grocery_item.dart';
 import 'package:naturix/widgets/custom_buttons.dart';
 
 class NewItem extends StatefulWidget {
@@ -167,7 +166,7 @@ class _NewItemState extends State<NewItem> {
                                         const SizedBox(width: 6),
                                         Text(
                                           category.value.title,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontFamily: 'anekMalayalam',
                                             color: Colors
                                                 .black, // Set the text color to black

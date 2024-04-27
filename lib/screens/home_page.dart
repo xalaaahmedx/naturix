@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -20,8 +19,8 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   double value = 0;
   int currentIndex = 0;
   final ImagePicker _imagePicker = ImagePicker();
@@ -73,7 +72,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyProfile(),
+        builder: (context) => const MyProfile(),
       ),
     );
   }
@@ -130,7 +129,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         elevation: 2,
-        title: Text(
+        title: const Text(
           'Naturix',
           style: TextStyle(
             fontFamily: 'anekMalayalam',
@@ -164,7 +163,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ],
       ),
-      drawer: Container(
+      drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
         child: Drawer(
           elevation: 0,
@@ -187,8 +186,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       return ListView.builder(
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
-                            final post = snapshot.data!.docs[index].data()
-                                as Map<String, dynamic>;
+                            final post = snapshot.data!.docs[index].data();
                             final imageUrl = post['ImageUrl'] as String? ?? '';
 
                             if (post['UserEmail'] == currentUser?.email) {
@@ -204,7 +202,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                 if (userSnapshot.connectionState ==
                                         ConnectionState.waiting ||
                                     !userSnapshot.hasData) {
-                                  return Center(
+                                  return const Center(
                                     child: CircularProgressIndicator(
                                       // Modernizing the circular progress indicator
                                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -228,7 +226,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                     if (commentSnapshot.connectionState ==
                                             ConnectionState.waiting ||
                                         !commentSnapshot.hasData) {
-                                      return Center(
+                                      return const Center(
                                         child: CircularProgressIndicator(
                                           // Modernizing the circular progress indicator
                                           valueColor:
@@ -242,7 +240,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                     final comments = commentSnapshot.data!.docs
                                         .map<Comments>((doc) {
                                       final commentData =
-                                          doc.data() as Map<String, dynamic>;
+                                          doc.data();
                                       return Comments(
                                         userProfileImageUrl:
                                             userData['profileImageUrl']

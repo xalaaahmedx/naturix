@@ -6,7 +6,7 @@ class MyTextFieldWithPhotoButton extends StatelessWidget {
   final bool obscureText;
   final VoidCallback onPressed;
 
-  const MyTextFieldWithPhotoButton({
+  const MyTextFieldWithPhotoButton({super.key, 
     required this.controller,
     required this.hintText,
     required this.obscureText,
@@ -26,18 +26,18 @@ class MyTextFieldWithPhotoButton extends StatelessWidget {
             obscureText: obscureText,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 16,
         ),
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            primary: Colors.blue,
+            backgroundColor: Colors.blue,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.photo),
               SizedBox(width: 8),

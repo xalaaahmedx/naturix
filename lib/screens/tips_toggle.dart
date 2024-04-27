@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:naturix/screens/chat.dart';
-import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/screens/tips.dart';
 import 'package:naturix/screens/organic_fertlizers_tips.dart';
 
@@ -14,7 +12,7 @@ class ToggleScreen extends StatefulWidget {
 }
 
 class _ToggleScreenState extends State<ToggleScreen> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {

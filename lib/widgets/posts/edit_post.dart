@@ -1,152 +1,141 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditPostScreen extends StatefulWidget {
   final String postId;
+  final String initialMessage;
+  final String initialImageUrl;
 
-  const EditPostScreen({Key? key, required this.postId}) : super(key: key);
+  const EditPostScreen({
+    Key? key,
+    required this.postId,
+    required this.initialMessage,
+    required this.initialImageUrl,
+  }) : super(key: key);
 
   @override
   _EditPostScreenState createState() => _EditPostScreenState();
 }
 
 class _EditPostScreenState extends State<EditPostScreen> {
-  TextEditingController _textEditingController = TextEditingController();
-  XFile? _pickedImage;
-  bool _loading = false;
+  late TextEditingController _messageController;
+  late String _imageUrl;
 
   @override
   void initState() {
     super.initState();
-    // Fetch the current post data and set it to the text field
-    _fetchPostData();
+    _messageController = TextEditingController(text: widget.initialMessage);
+    _imageUrl = widget.initialImageUrl;
   }
 
-  void _fetchPostData() async {
-    setState(() {
-      _loading = true;
-    });
+  Future<void> updatePost() async {
     try {
-      final postSnapshot = await FirebaseFirestore.instance
-          .collection('user posts')
-          .doc(widget.postId)
-          .get();
-      setState(() {
-        _textEditingController.text = postSnapshot['Message'] ?? '';
-        _loading = false;
-      });
-    } catch (error) {
-      print('Error fetching post data: $error');
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      setState(() {
-        _pickedImage = pickedImage;
-      });
-    }
-  }
-
-  Future<void> _updatePost() async {
-    setState(() {
-      _loading = true;
-    });
-
-    try {
-      String? downloadUrl;
-
-      if (_pickedImage != null) {
-        FirebaseStorage storage = FirebaseStorage.instance;
-        Reference storageReference = storage
-            .ref()
-            .child('images/${DateTime.now().millisecondsSinceEpoch}');
-        File imageFile = File(_pickedImage!.path);
-        UploadTask uploadTask = storageReference.putFile(imageFile);
-        await uploadTask.whenComplete(() => null);
-
-        downloadUrl = await storageReference.getDownloadURL();
-      }
-
       await FirebaseFirestore.instance
           .collection('user posts')
           .doc(widget.postId)
           .update({
-        'Message': _textEditingController.text,
-        'ImageUrl': downloadUrl,
+        'Message': _messageController.text,
+        'ImageUrl': _imageUrl,
       });
 
-      setState(() {
-        _loading = false;
-      });
-
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context); // Close the current screen (EditPostScreen)
-      } else {
-        // Handle the case when there's no navigator to pop
-        print('No valid navigator to pop');
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Post updated successfully')),
+      );
     } catch (e) {
       print('Error updating post: $e');
-      setState(() {
-        _loading = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update post')),
+      );
     }
   }
 
-  void _dismissKeyboard() {
-    FocusScope.of(context).unfocus();
+  Future<void> _getImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      try {
+        // Upload image to Firebase Storage
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('post_images')
+            .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+        await storageRef.putFile(File(pickedFile.path));
+
+        // Get download URL of the uploaded image
+        final imageUrl = await storageRef.getDownloadURL();
+
+        setState(() {
+          _imageUrl = imageUrl; // Update _imageUrl with the download URL
+        });
+      } catch (e) {
+        print('Error uploading image: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to upload image')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Post'),
+        title: const Text('Edit Post'),
       ),
-      body: GestureDetector(
-        onTap: _dismissKeyboard,
-        child: _loading
-            ? Center(child: CircularProgressIndicator())
-            : Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      controller: _textEditingController,
-                      decoration: InputDecoration(
-                        hintText: 'Edit your post...',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: null,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _pickImage,
-                      child: Text('Pick Image'),
-                    ),
-                    const SizedBox(height: 16),
-                    _pickedImage != null
-                        ? Image.file(File(_pickedImage!.path))
-                        : SizedBox(),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _updatePost,
-                      child: Text('Update Post'),
-                    ),
-                  ],
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ListView(
+          children: [
+            Stack(
+              children: [
+                if (_imageUrl.isNotEmpty)
+                  Image.network(
+                    _imageUrl,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                if (_imageUrl
+                    .isEmpty) // Render an empty container when _imageUrl is empty
+                  Container(
+                    height: 1,
+                    width: double.infinity,
+                  ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      _getImageFromGallery();
+                    },
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _messageController,
+              decoration: const InputDecoration(
+                labelText: 'Edit Message',
+                border: OutlineInputBorder(),
               ),
+              maxLines: null,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                updatePost();
+              },
+              child: const Text('Update Post'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final colorScheme = ColorScheme.fromSeed(
-  seedColor: Color.fromARGB(255, 138, 255, 241),
+  seedColor: const Color.fromARGB(255, 138, 255, 241),
   background: const Color.fromARGB(255, 250, 250, 250),
 );
 

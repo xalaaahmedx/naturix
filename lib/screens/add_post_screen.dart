@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/widgets/btm_nav_bar.dart';
 
 class AddPostScreen extends StatefulWidget {
@@ -103,7 +102,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                BtmNavBar()), // Replace HomePage with your home page widget
+                const BtmNavBar()), // Replace HomePage with your home page widget
       );
     } catch (e) {
       print('Error uploading post: $e');
@@ -140,7 +139,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
             children: [
               TextField(
                 controller: _textEditingController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'What\'s on your mind?',
                   border: InputBorder.none,
                 ),
@@ -153,19 +152,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     child: ElevatedButton(
                       onPressed: _pickImage,
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: const BorderRadius.only(
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12),
                           ),
                         ),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.photo),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text('Add Photo',
                               style: TextStyle(
                                 fontSize: 16,
@@ -180,9 +179,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     child: ElevatedButton(
                       onPressed: _uploadPost,
                       style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 1, 158, 140),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: const BorderRadius.only(
+                        backgroundColor: const Color.fromARGB(255, 1, 158, 140),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12),
                           ),
@@ -191,11 +190,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.edit),
+                          const Icon(Icons.edit),
                           const SizedBox(width: 8),
                           Text(
                             _isEditing ? 'Update Post' : 'Create Post',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                             ),

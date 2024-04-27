@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
@@ -22,7 +21,7 @@ class WallPostSearch extends StatelessWidget {
           FirebaseFirestore.instance.collection('user posts').doc(postId).get(),
       builder: (context, postSnapshot) {
         if (!postSnapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -42,7 +41,7 @@ class WallPostSearch extends StatelessWidget {
           .get(),
       builder: (context, userSnapshot) {
         if (!userSnapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }

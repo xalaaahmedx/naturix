@@ -50,7 +50,7 @@ class ProfileBodyWidget extends StatelessWidget {
             final post = userPosts[index].data() as Map<String, dynamic>;
 
             return Card(
-              margin: EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(vertical: 8),
               elevation: 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
