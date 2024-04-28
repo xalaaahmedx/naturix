@@ -461,13 +461,7 @@ class _WallPostState extends State<WallPost> {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(
-              currentUser.photoURL ?? '',
-            ),
-            radius: 24,
-          ),
-          const SizedBox(width: 8),
+         
           Expanded(
             child: TextFormField(
               controller: commentController,

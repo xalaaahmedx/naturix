@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:naturix/widgets/tipcard.dart';
 import 'package:naturix/widgets/tips_card.dart';
 import 'package:swipe_cards/swipe_cards.dart';
@@ -102,10 +101,10 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
       'assets/images/order.png',
       'assets/images/burger.png',
       'assets/images/earth.png',
-      'assets/images/Compost-cycle.gif',
-      'assets/images/Compost-cycle.gif',
-      'assets/images/Compost-cycle.gif',
-      'assets/images/Compost-cycle.gif',
+      'assets/images/break.png',
+      'assets/images/honey.png',
+      'assets/images/Peach.gif',
+      'assets/images/Shawarma (1).gif',
     ];
 
     if (tips.length == tipColors.length && tips.length == imagePaths.length) {
@@ -213,6 +212,4 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
       ),
     );
   }
-
- 
 }

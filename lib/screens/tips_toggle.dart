@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:naturix/screens/tips.dart';
 import 'package:naturix/screens/organic_fertlizers_tips.dart';
 
-
-
 class ToggleScreen extends StatefulWidget {
   const ToggleScreen({super.key});
 
@@ -116,7 +114,7 @@ class _ToggleScreenState extends State<ToggleScreen> {
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(15)),
                       child: Image.asset(
-                        'assets/images/org_tips.jpeg',
+                        'assets/images/tips22.jpg',
                         width: double.infinity,
                         height: 240,
                         fit: BoxFit.cover,

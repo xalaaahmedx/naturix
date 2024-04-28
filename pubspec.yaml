@@ -109,6 +109,9 @@ flutter:
     - assets/translations/
     - assets/icons/other.png
     - assets/images/earth.png
+    - assets/images/tips22.jpg
+    
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

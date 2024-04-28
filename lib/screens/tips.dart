@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:naturix/widgets/tipcard.dart';
 import 'package:naturix/widgets/tips_card.dart';
 import 'package:swipe_cards/swipe_cards.dart';
@@ -61,9 +60,9 @@ class _FoodWasteTipsScreenState extends State<FoodWasteTipsScreen> {
     List<Color> tipColors = [
       const Color.fromARGB(255, 80, 217, 227),
       const Color.fromARGB(255, 18, 200, 154),
-      const Color.fromARGB(255, 241, 168, 214),
+      Color.fromARGB(255, 232, 110, 187),
       const Color.fromARGB(255, 198, 139, 240),
-      const Color.fromARGB(255, 255, 252, 174),
+      const Color.fromARGB(255, 255, 160, 183),
       const Color.fromARGB(255, 255, 132, 110),
       const Color.fromARGB(255, 74, 208, 191),
     ];
