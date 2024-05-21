@@ -39,7 +39,7 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
       FoodWasteTip(
         title: "Combine with Other Compostable Materials",
         description:
-            "Combine spoiled food with other compostable materials like yard waste, leaves, straw, or coffee grounds to achieve a balanced mix of nitrogen-rich (greens) and carbon-rich (browns) components in your compost.",
+            "Combine spoiled food with other compostable materials like yard waste, leaves, straw, or coffee grounds to achieve a balanced mix of nitrogen-rich (greens) and carbon-rich (browns) in your compost.",
       ),
       FoodWasteTip(
         title: "Maintain a Good Carbon-to-Nitrogen Ratio",
@@ -132,6 +132,11 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarHeight =
+        screenSize.height > 600 ? kToolbarHeight + 20 : kToolbarHeight;
+    final double cardHeight = screenSize.height * 0.8;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -154,7 +159,7 @@ class _OrganicFetlizersTipsState extends State<OrganicFetlizersTips> {
         child: Column(
           children: [
             SizedBox(
-              height: 650,
+              height: cardHeight,
               child: SwipeCards(
                 matchEngine: _matchEngine,
                 itemBuilder: (BuildContext context, int index) {

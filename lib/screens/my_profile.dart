@@ -280,6 +280,10 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarHeight =
+        screenSize.height > 600 ? kToolbarHeight + 20 : kToolbarHeight;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 1, 158, 140),
@@ -327,7 +331,7 @@ class _MyProfileState extends State<MyProfile> {
                         },
                         onChangeProfilePicture: _changeProfilePicture,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: screenSize.height * 0.02),
                       Expanded(
                         child: ProfileBodyWidget(
                           userPosts: userPosts,
@@ -344,7 +348,7 @@ class _MyProfileState extends State<MyProfile> {
               child: Text('Error: ${snapshot.error}'),
             );
           }
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(),
           );
         },

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
-
 import 'package:naturix/widgets/widgetss/comment.dart';
+import 'package:sizer/sizer.dart'; // Import sizer
 
 class UserPosts extends StatelessWidget {
   final List<DocumentSnapshot> posts;
   final Map<String, dynamic> userData;
 
-  const UserPosts({super.key, 
+  const UserPosts({
+    Key? key,
     required this.posts,
     required this.userData,
-  });
+  }) : super(key: key);
 
   Future<List<Comments>> fetchComments(String postId) async {
     try {
@@ -47,78 +48,80 @@ class UserPosts extends StatelessWidget {
           final post = posts[index].data() as Map<String, dynamic>;
 
           return Card(
-            margin: const EdgeInsets.all(8),
-            elevation: 2,
+            margin: EdgeInsets.all(8.sp),
+            elevation: 2.sp,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.sp),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.sp),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       CircleAvatar(
-                        radius: 20,
+                        radius: 20.sp,
                         backgroundImage: NetworkImage(
                           userData['profileImageUrl'] as String? ?? '',
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.sp),
                       Text(
                         userData['username'] as String? ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.sp),
                   Text(
                     post['Message'] as String? ?? '',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 16.sp,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.sp),
                   if (post['ImageUrl'] != null)
                     Image.network(
                       post['ImageUrl'] as String? ?? '',
-                      height: 200,
+                      height: 200.sp,
                       fit: BoxFit.cover,
                     ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.sp),
                   Row(
                     children: [
-                      const Icon(Icons.favorite),
-                      const SizedBox(width: 4),
+                      Icon(Icons.favorite),
+                      SizedBox(width: 4.sp),
                       Text(
                         '${List<String>.from(post['Likes'] ?? []).length}',
                       ),
-                      const SizedBox(width: 16),
-                      const Icon(Icons.comment),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 16.sp),
+                      Icon(Icons.comment),
+                      SizedBox(width: 4.sp),
                       FutureBuilder<List<Comments>>(
                         future: fetchComments(posts[index].id),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Text('Loading...');
+                            return Text('Loading...');
                           }
                           if (snapshot.hasData) {
                             return Text('${snapshot.data!.length}');
                           }
-                          return const Text('0');
+                          return Text('0');
                         },
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.sp),
                   Text(
                     formatData(post['TimeStamp']),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.grey,
+                      fontSize: 12.sp,
                     ),
                   ),
                 ],

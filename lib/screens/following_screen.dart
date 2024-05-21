@@ -10,6 +10,9 @@ class FollowingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarHeight = AppBar().preferredSize.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Following'),
@@ -32,10 +35,13 @@ class FollowingScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(screenSize.width * 0.04),
                   child: Text(
                     'Following (${followingList.length})',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: screenSize.width * 0.05,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -73,9 +79,12 @@ class FollowingScreen extends StatelessWidget {
 
                             return Card(
                               margin: EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
+                                vertical: screenSize.width * 0.02,
+                                horizontal: screenSize.width * 0.08,
+                              ),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding:
+                                    EdgeInsets.all(screenSize.width * 0.04),
                                 child: Row(
                                   children: [
                                     GestureDetector(
@@ -95,12 +104,12 @@ class FollowingScreen extends StatelessWidget {
                                         );
                                       },
                                       child: CircleAvatar(
-                                        radius: 30,
+                                        radius: screenSize.width * 0.1,
                                         backgroundImage: NetworkImage(
                                             userData['profileImageUrl'] ?? ''),
                                       ),
                                     ),
-                                    SizedBox(width: 16.0),
+                                    SizedBox(width: screenSize.width * 0.04),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -109,17 +118,19 @@ class FollowingScreen extends StatelessWidget {
                                           Text(
                                             userData['username'] ?? '',
                                             style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: screenSize.width * 0.04,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(height: 4),
+                                          SizedBox(
+                                              height: screenSize.width * 0.01),
                                           Text(
                                             userData['bio'] ?? '',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize:
+                                                  screenSize.width * 0.035,
                                               color: Colors.grey,
                                             ),
                                           ),

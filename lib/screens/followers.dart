@@ -10,6 +10,8 @@ class FollowersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Followers'),
@@ -32,7 +34,8 @@ class FollowersScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(
+                      screenSize.width * 0.04), // Responsive padding
                   child: Text(
                     'Followers (${followersList.length})',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -73,9 +76,12 @@ class FollowersScreen extends StatelessWidget {
 
                             return Card(
                               margin: EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
+                                  vertical: screenSize.height * 0.01,
+                                  horizontal: screenSize.width *
+                                      0.04), // Responsive margin
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(screenSize.width *
+                                    0.04), // Responsive padding
                                 child: Row(
                                   children: [
                                     GestureDetector(
@@ -95,12 +101,15 @@ class FollowersScreen extends StatelessWidget {
                                         );
                                       },
                                       child: CircleAvatar(
-                                        radius: 30,
+                                        radius: screenSize.width *
+                                            0.08, // Responsive radius
                                         backgroundImage: NetworkImage(
                                             userData['profileImageUrl'] ?? ''),
                                       ),
                                     ),
-                                    SizedBox(width: 16.0),
+                                    SizedBox(
+                                        width: screenSize.width *
+                                            0.04), // Responsive spacing
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -109,17 +118,21 @@ class FollowersScreen extends StatelessWidget {
                                           Text(
                                             userData['username'] ?? '',
                                             style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: screenSize.width *
+                                                  0.05, // Responsive font size
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(height: 4),
+                                          SizedBox(
+                                              height: screenSize.height *
+                                                  0.01), // Responsive spacing
                                           Text(
                                             userData['bio'] ?? '',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: screenSize.width *
+                                                  0.04, // Responsive font size
                                               color: Colors.grey,
                                             ),
                                           ),

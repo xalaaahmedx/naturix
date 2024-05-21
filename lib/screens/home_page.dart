@@ -124,6 +124,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarHeight =
+        screenSize.height > 600 ? kToolbarHeight + 20 : kToolbarHeight;
+    final double drawerWidth = MediaQuery.of(context).size.width * 0.6;
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.grey[100],
@@ -164,7 +169,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         ],
       ),
       drawer: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.6,
+        width: drawerWidth,
         child: Drawer(
           elevation: 0,
           child: MainDrawer(navigateToPage: navigateToPage),
@@ -204,7 +209,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                     !userSnapshot.hasData) {
                                   return const Center(
                                     child: CircularProgressIndicator(
-                                      // Modernizing the circular progress indicator
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         Color.fromARGB(255, 1, 158, 140),
                                       ),
@@ -228,7 +232,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                         !commentSnapshot.hasData) {
                                       return const Center(
                                         child: CircularProgressIndicator(
-                                          // Modernizing the circular progress indicator
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
                                             Color.fromARGB(255, 1, 158, 140),
@@ -239,8 +242,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
                                     final comments = commentSnapshot.data!.docs
                                         .map<Comments>((doc) {
-                                      final commentData =
-                                          doc.data();
+                                      final commentData = doc.data();
                                       return Comments(
                                         userProfileImageUrl:
                                             userData['profileImageUrl']
@@ -298,7 +300,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     }
                     return const Center(
                         child: CircularProgressIndicator(
-                      // Modernizing the circular progress indicator
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Color.fromARGB(255, 1, 158, 140),
                       ),

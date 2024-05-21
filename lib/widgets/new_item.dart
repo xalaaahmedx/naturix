@@ -57,6 +57,9 @@ class _NewItemState extends State<NewItem> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -79,8 +82,8 @@ class _NewItemState extends State<NewItem> {
               children: [
                 Image.asset(
                   'assets/images/list.png', // Replace with the actual image path
-                  width: 300, // Set your desired width
-                  height: 300, // Set your desired height
+                  width: isSmallScreen ? 300 : 400,
+                  height: isSmallScreen ? 300 : 400,
                   fit: BoxFit.fitHeight,
                 ),
                 const SizedBox(height: 16),
@@ -91,7 +94,7 @@ class _NewItemState extends State<NewItem> {
                     children: [
                       TextFormField(
                         maxLength: 50,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Name',
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -119,7 +122,7 @@ class _NewItemState extends State<NewItem> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Quantity',
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -168,8 +171,7 @@ class _NewItemState extends State<NewItem> {
                                           category.value.title,
                                           style: const TextStyle(
                                             fontFamily: 'anekMalayalam',
-                                            color: Colors
-                                                .black, // Set the text color to black
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ],
@@ -181,7 +183,7 @@ class _NewItemState extends State<NewItem> {
                                   _selectedCategory = value!;
                                 });
                               },
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Category',
                                 border: OutlineInputBorder(),
                               ),
@@ -202,23 +204,27 @@ class _NewItemState extends State<NewItem> {
                           : () {
                               _formKey.currentState!.reset();
                             },
-                      child: const Text('Reset',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 1, 158, 140),
-                          )),
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 1, 158, 140),
+                        ),
+                      ),
                     ),
                     CustomButton(
                       onPressed: _saveItem,
                       child: _isSending
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 16,
                               height: 16,
                               child: CircularProgressIndicator(),
                             )
-                          : const Text('Add Item',
+                          : const Text(
+                              'Add Item',
                               style: TextStyle(
                                 color: Color.fromARGB(255, 255, 255, 255),
-                              )),
+                              ),
+                            ),
                     )
                   ],
                 ),

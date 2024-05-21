@@ -102,6 +102,9 @@ class _FoodWasteTipsScreenState extends State<FoodWasteTipsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final cardHeight = screenHeight * 0.8; // Adjust the percentage as needed
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -124,7 +127,7 @@ class _FoodWasteTipsScreenState extends State<FoodWasteTipsScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: 600,
+              height: cardHeight,
               child: SwipeCards(
                 matchEngine: _matchEngine,
                 itemBuilder: (BuildContext context, int index) {

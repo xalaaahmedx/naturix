@@ -115,6 +115,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Edit Post' : 'Create Post'),
@@ -122,15 +124,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
       body: GestureDetector(
         onTap: _dismissKeyboard,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(screenSize.width * 0.04),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(screenSize.width * 0.04),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
+                blurRadius: screenSize.width * 0.01,
+                spreadRadius: screenSize.width * 0.002,
               ),
             ],
           ),
@@ -139,13 +141,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
             children: [
               TextField(
                 controller: _textEditingController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'What\'s on your mind?',
                   border: InputBorder.none,
                 ),
                 maxLines: null,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: screenSize.width * 0.04),
               Row(
                 children: [
                   Expanded(
@@ -153,50 +155,54 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       onPressed: _pickImage,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.photo),
-                          SizedBox(width: 8),
-                          Text('Add Photo',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 1, 158, 140),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _uploadPost,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 1, 158, 140),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
+                            topLeft: Radius.circular(screenSize.width * 0.03),
+                            bottomRight:
+                                Radius.circular(screenSize.width * 0.03),
                           ),
                         ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.edit),
-                          const SizedBox(width: 8),
+                          Icon(Icons.photo),
+                          SizedBox(width: screenSize.width * 0.02),
+                          Text(
+                            'Add Photo',
+                            style: TextStyle(
+                              fontSize: screenSize.width * 0.04,
+                              color: Color.fromARGB(255, 1, 158, 140),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenSize.width * 0.04),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _uploadPost,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 1, 158, 140),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(screenSize.width * 0.03),
+                            bottomRight:
+                                Radius.circular(screenSize.width * 0.03),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.edit),
+                          SizedBox(width: screenSize.width * 0.02),
                           Text(
                             _isEditing ? 'Update Post' : 'Create Post',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: screenSize.width * 0.04,
                             ),
                           ),
                         ],
@@ -207,10 +213,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ),
               if (_pickedImage != null)
                 Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  height: 150,
+                  margin: EdgeInsets.only(top: screenSize.width * 0.04),
+                  height: screenSize.width * 0.6,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(screenSize.width * 0.03),
                     image: DecorationImage(
                       image: FileImage(File(_pickedImage!.path)),
                       fit: BoxFit.cover,

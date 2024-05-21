@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/screens/user_profile_screen.dart';
 import 'package:naturix/widgets/posts/edit_post.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/helper/helper_methods.dart';
+import 'package:sizer/sizer.dart';
 
 class WallPost extends StatefulWidget {
   const WallPost({
@@ -98,7 +100,7 @@ class _WallPostState extends State<WallPost> {
     }
   }
 
-  void addToFavorites() async {
+  void toggleFavorite() async {
     try {
       final currentUser = FirebaseAuth.instance.currentUser!;
       final postRef = FirebaseFirestore.instance
@@ -112,25 +114,33 @@ class _WallPostState extends State<WallPost> {
       List<dynamic> likes = List.from(postSnapshot['Likes']);
 
       // Check if the current user already liked the post
-      if (!likes.contains(currentUser.email)) {
+      if (likes.contains(currentUser.email)) {
+        // Remove the current user from the list of likes
+        likes.remove(currentUser.email);
+
+        // Show a message indicating that the post is removed from favorites
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Removed from favorites')),
+        );
+      } else {
         // Add the current user to the list of likes
         likes.add(currentUser.email);
-
-        // Update the list of likes in Firestore
-        await postRef.update({'Likes': likes});
 
         // Show a confirmation message or handle success
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Added to favorites')),
         );
-      } else {
-        // Show a message indicating that the post is already in favorites
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post already in favorites')),
-        );
       }
+
+      // Update the list of likes in Firestore
+      await postRef.update({'Likes': likes});
+
+      // Update the local isLiked state
+      setState(() {
+        isLiked = !isLiked;
+      });
     } catch (e) {
-      print('Error adding to favorites: $e');
+      print('Error toggling favorite: $e');
       // Show an error message or handle the error
     }
   }
@@ -149,309 +159,323 @@ class _WallPostState extends State<WallPost> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Comments>>(
-      future: widget.commentsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          final List<Comments> comments = snapshot.data ?? [];
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfile(
-                              useremail: widget.user,
-                              currentUserEmail: currentUser.email!,
-                            ),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          widget.userProfileImageUrl,
-                        ),
-                        radius: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.user)
-                                .get(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return const Text('Loading...');
-                              }
-
-                              final userData =
-                                  snapshot.data!.data() as Map<String, dynamic>;
-                              final username = userData['username'] ?? '';
-
-                              return Text(
-                                username,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return FutureBuilder<List<Comments>>(
+          future: widget.commentsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else {
+              final List<Comments> comments = snapshot.data ?? [];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserProfile(
+                                  useremail: widget.user,
+                                  currentUserEmail: currentUser.email!,
                                 ),
-                              );
-                            },
-                          ),
-                          Text(
-                            widget.time,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuButton<String>(
-                      icon: widget.user == currentUser.email
-                          ? Icon(Icons.more_vert, color: Colors.grey)
-                          : Icon(
-                              isLiked ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                            ),
-                      itemBuilder: (context) => [
-                        if (widget.user == currentUser.email)
-                          PopupMenuItem<String>(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, color: Colors.red),
-                                SizedBox(width: 8),
-                                Text('Delete',
-                                    style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        if (widget.user == currentUser.email)
-                          PopupMenuItem<String>(
-                            value: 'update',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.edit,
-                                  color: Color.fromARGB(255, 1, 158, 140),
-                                ),
-                                SizedBox(width: 8),
-                                Text('Update',
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 1, 158, 140),
-                                    )),
-                              ],
-                            ),
-                          ),
-                        PopupMenuItem<String>(
-                          value: 'favorites',
-                          child: Row(
-                            children: [
-                              Icon(
-                                isLiked ? Icons.star : Icons.star_border,
-                                color: Color.fromARGB(255, 1, 158, 140),
                               ),
-                              SizedBox(width: 8),
+                            );
+                          },
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              widget.userProfileImageUrl,
+                            ),
+                            radius: 24.sp, // Use sp from DeviceExt
+                          ),
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FutureBuilder<DocumentSnapshot>(
+                                future: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.user)
+                                    .get(),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return Text('Loading...');
+                                  }
+
+                                  final userData = snapshot.data!.data()
+                                      as Map<String, dynamic>;
+                                  final username = userData['username'] ?? '';
+
+                                  return Text(
+                                    username,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.sp, // Use sp from DeviceExt
+                                    ),
+                                  );
+                                },
+                              ),
                               Text(
-                                isLiked
-                                    ? 'Remove from Favorites'
-                                    : 'Add to Favorites',
+                                widget.time,
                                 style: TextStyle(
-                                  color: Color.fromARGB(255, 1, 158, 140),
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                      onSelected: (String value) {
-                        switch (value) {
-                          case 'delete':
-                            deletePost();
-                            break;
-                          case 'update':
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditPostScreen(
-                                  postId: widget.postId,
-                                  initialMessage: widget.messages,
-                                  initialImageUrl: widget.imageUrl,
+                        PopupMenuButton<String>(
+                          icon: widget.user == currentUser.email
+                              ? Icon(Icons.more_vert, color: Colors.grey)
+                              : Icon(
+                                  isLiked ? Icons.star : Icons.star_border,
+                                  color: Colors.amber,
+                                ),
+                          itemBuilder: (context) => [
+                            if (widget.user == currentUser.email)
+                              PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                            break;
-                          case 'favorites':
-                            addToFavorites();
-                            break;
-                        }
-                      },
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  widget.messages,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              if (widget.imageUrl.isNotEmpty)
-                Container(
-                  height: 300,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        widget.imageUrl,
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        if (widget.user != currentUser.email)
-                          GestureDetector(
-                            onTap: () async {
-                              try {
-                                // Fetch the user document from Firestore
-                                DocumentSnapshot userDocument =
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(widget.user)
-                                        .get();
-
-                                // Extract data from the user document
-                                final data =
-                                    userDocument.data() as Map<String, dynamic>;
-
+                            if (widget.user == currentUser.email)
+                              PopupMenuItem<String>(
+                                value: 'update',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.edit,
+                                      color: Color.fromARGB(255, 1, 158, 140),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Update',
+                                      style: TextStyle(
+                                        color: Color.fromARGB(255, 1, 158, 140),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            PopupMenuItem<String>(
+                              value: 'favorites',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isLiked ? Icons.star : Icons.star_border,
+                                    color: Color.fromARGB(255, 1, 158, 140),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    isLiked
+                                        ? 'Remove from Favorites'
+                                        : 'Add to Favorites',
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 1, 158, 140),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onSelected: (String value) {
+                            switch (value) {
+                              case 'delete':
+                                deletePost();
+                                break;
+                              case 'update':
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ChatPage(
-                                      userEmail: data['email'],
-                                      recieverUserId: data['email'],
+                                    builder: (context) => EditPostScreen(
+                                      postId: widget.postId,
+                                      initialMessage: widget.messages,
+                                      initialImageUrl: widget.imageUrl,
                                     ),
                                   ),
                                 );
-                              } catch (e) {
-                                print('Error fetching user data: $e');
-                              }
-                            },
-                            child: Image.asset(
-                              'assets/icons/message.png',
-                              width: 30,
-                              height: 30,
-                            ),
-                          ),
-                        const SizedBox(width: 16),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              showComments = !showComments;
-                            });
-                          },
-                          child: Image.asset(
-                            'assets/icons/comments.png',
-                            width: 30,
-                            height: 30,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('user posts')
-                              .doc(widget.postId)
-                              .collection('Comments')
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Text(
-                                '0',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              );
+                                break;
+                              case 'favorites':
+                                toggleFavorite();
+                                break;
                             }
-                            return Text(
-                              snapshot.data!.docs.length.toString(),
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            );
                           },
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      widget.messages,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.sp, // Use sp from DeviceExt
+                      ),
+                    ),
+                  ),
+                  if (widget.imageUrl.isNotEmpty)
+                    Container(
+                      height: 300.sp, // Use sp from DeviceExt
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            widget.imageUrl,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            if (widget.user != currentUser.email)
+                              GestureDetector(
+                                onTap: () async {
+                                  try {
+                                    // Fetch the user document from Firestore
+                                    DocumentSnapshot userDocument =
+                                        await FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(widget.user)
+                                            .get();
+
+                                    // Extract data from the user document
+                                    final data = userDocument.data()
+                                        as Map<String, dynamic>;
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatPage(
+                                          userEmail: data['email'],
+                                          recieverUserId: data['email'],
+                                        ),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    print('Error fetching user data: $e');
+                                  }
+                                },
+                                child: Image.asset(
+                                  'assets/icons/message.png',
+                                  width: 30.sp, // Use sp from DeviceExt
+                                  height: 30.sp, // Use sp from DeviceExt
+                                ),
+                              ),
+                            SizedBox(width: 16.sp), // Use sp from DeviceExt
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  showComments = !showComments;
+                                });
+                              },
+                              child: Image.asset(
+                                'assets/icons/comments.png',
+                                width: 30.sp, // Use sp from DeviceExt
+                                height: 30.sp, // Use sp from DeviceExt
+                              ),
+                            ),
+                            SizedBox(width: 8.sp), // Use sp from DeviceExt
+                            StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('user posts')
+                                  .doc(widget.postId)
+                                  .collection('Comments')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Text(
+                                    '0',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14.sp, // Use sp from DeviceExt
+                                    ),
+                                  );
+                                }
+                                return Text(
+                                  snapshot.data!.docs.length.toString(),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14.sp, // Use sp from DeviceExt
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                  if (showComments) ...[
+                    _buildCommentInputField(),
+                    StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('user posts')
+                          .doc(widget.postId)
+                          .collection('Comments')
+                          .orderBy('CommentTime', descending: true)
+                          .snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        List<Widget> commentWidgets =
+                            snapshot.data!.docs.map<Widget>((doc) {
+                          final commentData =
+                              doc.data() as Map<String, dynamic>;
+                          return Comments(
+                            user: commentData['CommentedBy'],
+                            userProfileImageUrl: widget.userProfileImageUrl,
+                            text: commentData['CommentText'],
+                            time: formatData(commentData['CommentTime']),
+                            imageUrl: null,
+                            username: commentData['username'], // Add this line
+                          );
+                        }).toList();
+
+                        return Column(
+                          children: commentWidgets,
+                        );
+                      },
+                    ),
                   ],
-                ),
-              ),
-              if (showComments) ...[
-                _buildCommentInputField(),
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('user posts')
-                      .doc(widget.postId)
-                      .collection('Comments')
-                      .orderBy('CommentTime', descending: true)
-                      .snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-
-                    List<Widget> commentWidgets =
-                        snapshot.data!.docs.map<Widget>((doc) {
-                      final commentData = doc.data() as Map<String, dynamic>;
-                      return Comments(
-                        user: commentData['CommentedBy'],
-                        userProfileImageUrl: widget.userProfileImageUrl,
-                        text: commentData['CommentText'],
-                        time: formatData(commentData['CommentTime']),
-                        imageUrl: null,
-                        username: commentData['username'], // Add this line
-                      );
-                    }).toList();
-
-                    return Column(
-                      children: commentWidgets,
-                    );
-                  },
-                ),
-              ],
-            ],
-          );
-        }
+                ],
+              );
+            }
+          },
+        );
       },
     );
   }
@@ -461,7 +485,6 @@ class _WallPostState extends State<WallPost> {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-         
           Expanded(
             child: TextFormField(
               controller: commentController,

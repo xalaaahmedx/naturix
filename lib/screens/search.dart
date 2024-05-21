@@ -43,10 +43,14 @@ class _SearchScreenState extends State<SearchScreen>
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double textFieldHeight = screenSize.height * 0.06;
+    final double tabBarHeight = screenSize.height * 0.08;
+
     return Scaffold(
       appBar: AppBar(
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
+          preferredSize: Size.fromHeight(textFieldHeight),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
@@ -73,27 +77,22 @@ class _SearchScreenState extends State<SearchScreen>
             ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // Add filter functionality if needed
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Users'),
-              Tab(text: 'Posts'),
-            ],
-            labelColor: const Color.fromARGB(255, 1, 158, 140),
-            unselectedLabelColor: Colors.grey,
-            indicatorSize: TabBarIndicatorSize.label,
-            indicatorColor: const Color.fromARGB(255, 1, 158, 140),
+          SizedBox(
+            height: tabBarHeight,
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Users'),
+                Tab(text: 'Posts'),
+              ],
+              labelColor: const Color.fromARGB(255, 1, 158, 140),
+              unselectedLabelColor: Colors.grey,
+              indicatorSize: TabBarIndicatorSize.label,
+              indicatorColor: const Color.fromARGB(255, 1, 158, 140),
+            ),
           ),
           Expanded(
             child: TabBarView(
@@ -197,7 +196,8 @@ class _SearchScreenState extends State<SearchScreen>
 
   Widget _buildUserResult(Map<String, dynamic> user) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       leading: CircleAvatar(
         backgroundImage: NetworkImage(user['profileImageUrl'] ?? ''),
       ),

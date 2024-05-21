@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/widgets/PROFILE/user_profile_header.dart';
+import 'package:sizer/sizer.dart'; // Import sizer
 
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/posts/wallposts.dart';
@@ -174,7 +175,7 @@ class _UserProfileState extends State<UserProfile> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
-            return Column(
+            return ListView(
               children: [
                 UserProfileHeader(
                   userData: userData,
@@ -212,7 +213,7 @@ class _UserProfileState extends State<UserProfile> {
                 ),
                 const Divider(),
                 const SizedBox(height: 16),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -220,59 +221,59 @@ class _UserProfileState extends State<UserProfile> {
                       'User Posts',
                       style: TextStyle(
                         fontFamily: 'anekMalayalam',
-                        fontSize: 20,
+                        fontSize: 20.sp, // Using sp for font size
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final posts = snapshot.data!.docs;
-                        return ListView.builder(
-                          itemCount: posts.length,
-                          itemBuilder: (context, index) {
-                            final post =
-                                posts[index].data() as Map<String, dynamic>;
+                StreamBuilder<QuerySnapshot>(
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final posts = snapshot.data!.docs;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: posts.length,
+                        itemBuilder: (context, index) {
+                          final post =
+                              posts[index].data() as Map<String, dynamic>;
 
-                            return Card(
-                              margin: const EdgeInsets.all(8),
-                              elevation: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: WallPost(
-                                  userProfileImageUrl:
-                                      userData['profileImageUrl'] as String? ??
-                                          '',
-                                  messages: post['Message'],
-                                  user: post['UserEmail'],
-                                  postId: posts[index].id,
-                                  likes: List<String>.from(post['Likes'] ?? []),
-                                  time: formatData(post['TimeStamp']),
-                                  imageUrl: post['ImageUrl'] as String? ?? '',
-                                  commentsFuture:
-                                      fetchComments(posts[index].id),
-                                ),
+                          return Card(
+                            margin: EdgeInsets.all(8.sp), // Using sp for margin
+                            elevation: 2.sp, // Using sp for elevation
+                            child: Padding(
+                              padding:
+                                  EdgeInsets.all(8.sp), // Using sp for padding
+                              child: WallPost(
+                                userProfileImageUrl:
+                                    userData['profileImageUrl'] as String? ??
+                                        '',
+                                messages: post['Message'],
+                                user: post['UserEmail'],
+                                postId: posts[index].id,
+                                likes: List<String>.from(post['Likes'] ?? []),
+                                time: formatData(post['TimeStamp']),
+                                imageUrl: post['ImageUrl'] as String? ?? '',
+                                commentsFuture: fetchComments(posts[index].id),
                               ),
-                            );
-                          },
-                        );
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text('Error: ${snapshot.error}'),
-                        );
-                      }
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
                       );
-                    },
-                    stream: FirebaseFirestore.instance
-                        .collection('user posts')
-                        .where('UserEmail', isEqualTo: widget.useremail)
-                        .snapshots(),
-                  ),
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                  stream: FirebaseFirestore.instance
+                      .collection('user posts')
+                      .where('UserEmail', isEqualTo: widget.useremail)
+                      .snapshots(),
                 ),
               ],
             );

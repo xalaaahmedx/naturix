@@ -59,6 +59,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favorites'),
@@ -82,8 +84,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           }
 
           return Padding(
-            padding: const EdgeInsets.all(10),
-            child: ListView.builder(
+              padding:
+                  EdgeInsets.all(screenSize.width * 0.05), // Responsive padding
+              child: ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   final post =
@@ -105,7 +108,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           !userSnapshot.hasData) {
                         return const Center(
                           child: CircularProgressIndicator(
-                            // Modernizing the circular progress indicator
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Color.fromARGB(255, 1, 158, 140),
                             ),
@@ -115,7 +117,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
                       final userData =
                           userSnapshot.data!.data() as Map<String, dynamic>;
-
                       return FutureBuilder(
                         future: FirebaseFirestore.instance
                             .collection('user posts')
@@ -139,8 +140,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
                           final comments =
                               commentSnapshot.data!.docs.map<Comments>((doc) {
-                            final commentData =
-                                doc.data();
+                            final commentData = doc.data();
                             return Comments(
                               userProfileImageUrl:
                                   userData['profileImageUrl'] as String? ?? '',
@@ -154,11 +154,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           return Card(
                             elevation: 2,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                  12), // Responsive radius
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width *
+                                    0.05, // Responsive horizontal padding
+                                vertical: screenSize.height *
+                                    0.02, // Responsive vertical padding
+                              ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   WallPost(
                                     userProfileImageUrl:
@@ -167,15 +174,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                             '',
                                     messages: post['Message'],
                                     user: post['UserEmail'],
-                                    postId: snapshot.data!.docs[index].id ?? '',
+                                    postId: snapshot.data!.docs[index].id??'',
                                     likes:
                                         List<String>.from(post['Likes'] ?? []),
                                     time: formatData(post['TimeStamp']),
                                     imageUrl: imageUrl,
                                     commentsFuture: fetchComments(
-                                        snapshot.data!.docs[index].id ?? ''),
+                                        snapshot.data!.docs[index].id??""),
                                   ),
-                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                      height: screenSize.height *
+                                          0.02), // Responsive spacing
                                 ],
                               ),
                             ),
@@ -184,8 +193,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       );
                     },
                   );
-                }),
-          );
+                },
+              ));
         },
       ),
     );

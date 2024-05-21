@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart'; // Import sizer package
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/posts/wallposts.dart';
@@ -42,24 +43,28 @@ class ProfileBodyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.sp), // Use sizer method for padding
       child: Expanded(
+        // Use Expanded widget here
         child: ListView.builder(
           itemCount: userPosts.length,
           itemBuilder: (context, index) {
             final post = userPosts[index].data() as Map<String, dynamic>;
 
             return Card(
-              margin: const EdgeInsets.symmetric(vertical: 8),
+              margin: EdgeInsets.symmetric(
+                  vertical: 8.sp), // Use sizer method for margin
               elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                    12.sp), // Use sizer method for border radius
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding:
+                        EdgeInsets.all(12.sp), // Use sizer method for padding
                     child: WallPost(
                       userProfileImageUrl:
                           userData['profileImageUrl'] as String? ?? '',

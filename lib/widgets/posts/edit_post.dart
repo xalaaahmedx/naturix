@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sizer/sizer.dart';
 
 class EditPostScreen extends StatefulWidget {
   final String postId;
@@ -87,55 +88,82 @@ class _EditPostScreenState extends State<EditPostScreen> {
       appBar: AppBar(
         title: const Text('Edit Post'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: [
-            Stack(
+      body: Sizer(
+        builder: (context, orientation, deviceType) {
+          return Padding(
+            padding: EdgeInsets.all(5.w),
+            child: ListView(
               children: [
-                if (_imageUrl.isNotEmpty)
-                  Image.network(
-                    _imageUrl,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                SizedBox(
+                  height: 50.h,
+                  child: Stack(
+                    children: [
+                      if (_imageUrl.isNotEmpty)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            _imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      if (_imageUrl.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: Text(
+                              'No Image',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ),
+                        ),
+                      Positioned(
+                        top: 2.h,
+                        right: 2.w,
+                        child: IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            _getImageFromGallery();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                if (_imageUrl
-                    .isEmpty) // Render an empty container when _imageUrl is empty
-                  Container(
-                    height: 1,
-                    width: double.infinity,
+                ),
+                SizedBox(height: 5.h),
+                TextFormField(
+                  controller: _messageController,
+                  decoration: InputDecoration(
+                    labelText: 'Edit Message',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: EdgeInsets.all(5.w),
                   ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      _getImageFromGallery();
-                    },
+                  maxLines: null,
+                ),
+                SizedBox(height: 5.h),
+                ElevatedButton(
+                  onPressed: () {
+                    updatePost();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 2.h, horizontal: 5.w),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  child: const Text('Update Post'),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: _messageController,
-              decoration: const InputDecoration(
-                labelText: 'Edit Message',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: null,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                updatePost();
-              },
-              child: const Text('Update Post'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

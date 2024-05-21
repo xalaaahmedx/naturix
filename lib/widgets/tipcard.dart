@@ -18,6 +18,9 @@ class TipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 600;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -38,8 +41,8 @@ class TipCard extends StatelessWidget {
         children: [
           if (image != null)
             Container(
-              height: 390,
-              width: 400,
+              height: isSmallScreen ? screenSize.height * 0.5 : 450,
+              width: isSmallScreen ? screenSize.width * 1 : 500,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: image!,

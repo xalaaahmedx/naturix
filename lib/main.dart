@@ -8,7 +8,7 @@ import 'package:naturix/screens/login_page.dart';
 import 'package:naturix/services/auth/auth_sarvice.dart';
 import 'package:naturix/widgets/btm_nav_bar.dart';
 import 'package:provider/provider.dart';
-
+import 'package:sizer/sizer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final colorScheme = ColorScheme.fromSeed(
@@ -48,21 +48,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: theme,
-      title: 'Naturix',
-      debugShowCheckedModeBanner: false,
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            final User? user = snapshot.data;
-            return user != null ? const BtmNavBar() : const LoginPage();
-          } else {
-            return const CircularProgressIndicator();
-          }
-        },
-      ),
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          theme: theme,
+          title: 'Naturix',
+          debugShowCheckedModeBanner: false,
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (ctx, snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                final User? user = snapshot.data;
+                return user != null ? const BtmNavBar() : const LoginPage();
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

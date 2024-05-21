@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class UserProfileHeader extends StatelessWidget {
   final Map<String, dynamic> userData;
@@ -10,7 +11,8 @@ class UserProfileHeader extends StatelessWidget {
   final VoidCallback toggleFollow;
   final VoidCallback messageUser;
 
-  const UserProfileHeader({super.key, 
+  const UserProfileHeader({
+    Key? key,
     required this.userData,
     required this.bio,
     required this.postsCount,
@@ -19,12 +21,12 @@ class UserProfileHeader extends StatelessWidget {
     required this.isFollowing,
     required this.toggleFollow,
     required this.messageUser,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.sp),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -37,7 +39,7 @@ class UserProfileHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          SizedBox(height: 5.sp),
           GestureDetector(
             onTap: () {
               // Implement the image change functionality if needed
@@ -47,28 +49,28 @@ class UserProfileHeader extends StatelessWidget {
                 userData['profileImageUrl'] ??
                     'https://example.com/default-profile-image.jpg',
               ),
-              radius: 50,
+              radius: 50.sp,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 5.sp),
           Text(
             userData['username'] ?? '',
-            style: const TextStyle(
-              fontSize: 24,
+            style: TextStyle(
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 5.sp),
           Text(
             bio,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: 16.sp,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 5.sp),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -76,13 +78,13 @@ class UserProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     '$postsCount',
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Posts',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -92,13 +94,13 @@ class UserProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     '$followersCount',
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Followers',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -108,13 +110,13 @@ class UserProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     '$followingCount',
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Following',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -122,7 +124,7 @@ class UserProfileHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.sp),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -131,50 +133,53 @@ class UserProfileHeader extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[200],
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(25.sp),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.sp,
+                    vertical: 10.sp,
+                  ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.mail, size: 24),
-                    SizedBox(width: 8),
+                    Icon(Icons.mail, size: 18.sp),
+                    SizedBox(width: 8.sp),
                     Text(
                       'Message',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.sp),
               ElevatedButton(
                 onPressed: toggleFollow,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFollowing
                       ? Colors.grey[200]
-                      : const Color.fromARGB(255, 1, 158, 140),
+                      : Color.fromARGB(255, 1, 158, 140),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(25.sp),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.sp,
+                    vertical: 10.sp,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                        isFollowing
-                            ? Icons.person_remove
-                            : Icons.person_add,
-                        size: 24),
-                    const SizedBox(width: 8),
+                      isFollowing ? Icons.person_remove : Icons.person_add,
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 8.sp),
                     Text(
                       isFollowing ? 'Unfollow' : 'Follow',
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

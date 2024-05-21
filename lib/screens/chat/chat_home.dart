@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/services/chat_service/chat_service.dart';
 
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
             color: Colors.black,
             fontFamily: 'anekMalayalam',
             fontWeight: FontWeight.bold,
+            fontSize: 20.sp,
           ),
         ),
         elevation: 0,
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> {
         final conversationIds = snapshot.data!;
 
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(4.w),
           itemCount: conversationIds.length,
           itemBuilder: (context, index) {
             return _buildConversationCard(conversationIds[index]);
@@ -61,7 +63,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildConversationCard(String conversationId) {
     return Card(
       elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: EdgeInsets.symmetric(vertical: 2.w),
       child: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('conversations')
@@ -80,7 +82,6 @@ class _HomePageState extends State<HomePage> {
           final participants = data['participants'] as List;
           final lastMessage = data['lastMessage'] as String;
 
-          // Extract the email of the other participant
           final otherParticipantEmail = participants
               .firstWhere((email) => email != _auth.currentUser!.email);
 
@@ -106,15 +107,15 @@ class _HomePageState extends State<HomePage> {
                   username,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 16.sp,
                   ),
                 ),
                 subtitle: Text(
                   lastMessage,
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                 ),
                 leading: CircleAvatar(
-                  radius: 30,
+                  radius: 10.w,
                   backgroundImage: profileImageUrl != null
                       ? NetworkImage(profileImageUrl) as ImageProvider<Object>?
                       : AssetImage('assets/default_image.png')

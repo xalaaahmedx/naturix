@@ -14,6 +14,13 @@ class _ToggleScreenState extends State<ToggleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double containerHeight = (screenSize.height -
+                kToolbarHeight -
+                MediaQuery.of(context).padding.top) /
+            2 -
+        40; // Subtracting app bar height and padding
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -34,7 +41,7 @@ class _ToggleScreenState extends State<ToggleScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment:
-              MainAxisAlignment.start, // Align components to start
+              MainAxisAlignment.spaceEvenly, // Adjusted alignment
           children: [
             GestureDetector(
               onTap: () {
@@ -46,7 +53,7 @@ class _ToggleScreenState extends State<ToggleScreen> {
                 );
               },
               child: Container(
-                margin: const EdgeInsets.only(top: 10), // Add margin to the top
+                height: containerHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
@@ -60,14 +67,15 @@ class _ToggleScreenState extends State<ToggleScreen> {
                 ),
                 child: Column(
                   children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(15)),
-                      child: Image.asset(
-                        'assets/images/org_tips.jpeg',
-                        width: double.infinity,
-                        height: 240,
-                        fit: BoxFit.cover,
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(15)),
+                        child: Image.asset(
+                          'assets/images/org_tips.jpeg',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     Container(
@@ -85,7 +93,6 @@ class _ToggleScreenState extends State<ToggleScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -96,7 +103,7 @@ class _ToggleScreenState extends State<ToggleScreen> {
                 );
               },
               child: Container(
-                margin: const EdgeInsets.only(top: 10), // Add margin to the top
+                height: containerHeight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
@@ -110,14 +117,15 @@ class _ToggleScreenState extends State<ToggleScreen> {
                 ),
                 child: Column(
                   children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(15)),
-                      child: Image.asset(
-                        'assets/images/tips22.jpg',
-                        width: double.infinity,
-                        height: 240,
-                        fit: BoxFit.cover,
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(15)),
+                        child: Image.asset(
+                          'assets/images/tips22.jpg',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     Container(
