@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
 
@@ -189,121 +190,124 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.builder(
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            final post = snapshot.data!.docs[index].data();
-                            final imageUrl = post['ImageUrl'] as String? ?? '';
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          final post = snapshot.data!.docs[index].data();
+                          final imageUrl = post['ImageUrl'] as String? ?? '';
 
-                            if (post['UserEmail'] == currentUser?.email) {
-                              return Container(); // Skip rendering this post
-                            }
+                          if (post['UserEmail'] == currentUser?.email) {
+                            return Container(); // Skip rendering this post
+                          }
 
-                            return FutureBuilder(
-                              future: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(post['UserEmail'])
-                                  .get(),
-                              builder: (context, userSnapshot) {
-                                if (userSnapshot.connectionState ==
-                                        ConnectionState.waiting ||
-                                    !userSnapshot.hasData) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Color.fromARGB(255, 1, 158, 140),
-                                      ),
+                          return FutureBuilder(
+                            future: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(post['UserEmail'])
+                                .get(),
+                            builder: (context, userSnapshot) {
+                              if (userSnapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  !userSnapshot.hasData) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Color.fromARGB(255, 1, 158, 140),
                                     ),
-                                  );
-                                }
+                                  ),
+                                );
+                              }
 
-                                final userData = userSnapshot.data!.data()
-                                    as Map<String, dynamic>;
+                              final userData = userSnapshot.data!.data()
+                                  as Map<String, dynamic>;
 
-                                return FutureBuilder(
-                                  future: FirebaseFirestore.instance
-                                      .collection('user posts')
-                                      .doc(snapshot.data!.docs[index].id)
-                                      .collection('Comments')
-                                      .orderBy('CommentTime', descending: true)
-                                      .get(),
-                                  builder: (context, commentSnapshot) {
-                                    if (commentSnapshot.connectionState ==
-                                            ConnectionState.waiting ||
-                                        !commentSnapshot.hasData) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            Color.fromARGB(255, 1, 158, 140),
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                    final comments = commentSnapshot.data!.docs
-                                        .map<Comments>((doc) {
-                                      final commentData = doc.data();
-                                      return Comments(
-                                        userProfileImageUrl:
-                                            userData['profileImageUrl']
-                                                    as String? ??
-                                                '',
-                                        text: commentData['CommentText'],
-                                        user: commentData['CommentedBy'],
-                                        time: formatData(
-                                            commentData['CommentTime']),
-                                        imageUrl: null,
-                                      );
-                                    }).toList();
-
-                                    return Card(
-                                      elevation: 2,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          children: [
-                                            WallPost(
-                                              userProfileImageUrl:
-                                                  userData['profileImageUrl']
-                                                          as String? ??
-                                                      '',
-                                              messages: post['Message'],
-                                              user: post['UserEmail'],
-                                              postId: snapshot
-                                                      .data!.docs[index].id ??
-                                                  '',
-                                              likes: List<String>.from(
-                                                  post['Likes'] ?? []),
-                                              time:
-                                                  formatData(post['TimeStamp']),
-                                              imageUrl: imageUrl,
-                                              commentsFuture: fetchComments(
-                                                  snapshot.data!.docs[index]
-                                                          .id ??
-                                                      ''),
-                                            ),
-                                            const SizedBox(height: 16),
-                                          ],
+                              return FutureBuilder(
+                                future: FirebaseFirestore.instance
+                                    .collection('user posts')
+                                    .doc(snapshot.data!.docs[index].id)
+                                    .collection('Comments')
+                                    .orderBy('CommentTime', descending: true)
+                                    .get(),
+                                builder: (context, commentSnapshot) {
+                                  if (commentSnapshot.connectionState ==
+                                          ConnectionState.waiting ||
+                                      !commentSnapshot.hasData) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          Color.fromARGB(255, 1, 158, 140),
                                         ),
                                       ),
                                     );
-                                  },
-                                );
-                              },
-                            );
-                          });
+                                  }
+
+                                  final comments = commentSnapshot.data!.docs
+                                      .map<Comments>((doc) {
+                                    final commentData = doc.data();
+                                    return Comments(
+                                      userProfileImageUrl:
+                                          userData['profileImageUrl']
+                                                  as String? ??
+                                              '',
+                                      text: commentData['CommentText'],
+                                      user: commentData['CommentedBy'],
+                                      time: formatData(
+                                          commentData['CommentTime']),
+                                      imageUrl: null,
+                                    );
+                                  }).toList();
+
+                                  return Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        children: [
+                                          WallPost(
+                                            userProfileImageUrl:
+                                                userData['profileImageUrl']
+                                                        as String? ??
+                                                    '',
+                                            messages: post['Message'],
+                                            user: post['UserEmail'],
+                                            postId:
+                                                snapshot.data!.docs[index].id ??
+                                                    '',
+                                            likes: List<String>.from(
+                                                post['Likes'] ?? []),
+                                            time: formatData(post['TimeStamp']),
+                                            imageUrl: imageUrl,
+                                            commentsFuture: fetchComments(
+                                                snapshot.data!.docs[index].id ??
+                                                    ''),
+                                          ).animate().fadeIn(
+                                              duration: 500
+                                                  .ms), // Animation applied here
+                                          const SizedBox(height: 16),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ).animate().fadeIn(
+                              duration: 500.ms); // Animation applied here
+                        },
+                      );
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     }
                     return const Center(
-                        child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.fromARGB(255, 1, 158, 140),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color.fromARGB(255, 1, 158, 140),
+                        ),
                       ),
-                    ));
+                    );
                   },
                 ),
               ),
