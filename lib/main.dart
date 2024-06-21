@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:naturix/firebase_options.dart';
+import 'package:naturix/recommendation/views/blocs/recommendation_cubit.dart';
+import 'package:naturix/recommendation/views/blocs/shopping_list/shopping_list_cubit.dart';
 
 import 'package:naturix/screens/login_page.dart';
 import 'package:naturix/services/auth/auth_sarvice.dart';
 import 'package:naturix/widgets/btm_nav_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'helper/firebase_notification_helper.dart';
 
 final colorScheme = ColorScheme.fromSeed(
   seedColor: const Color.fromARGB(255, 138, 255, 241),
@@ -37,6 +41,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseNotificationHelper().notificationInit();
   runApp(
     ChangeNotifierProvider(
         create: (context) => AuthService(), child: const MyApp()),
@@ -48,8 +53,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
+    return MultiProvider(
+      providers: [
+        Provider (create: (_) => RecommendationCubit()),
+        Provider (create: (_) => ShoppingListCubit()),
+
+      ],
+      builder: (context,widget) {
         return MaterialApp(
           theme: theme,
           title: 'Naturix',

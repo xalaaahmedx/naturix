@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:naturix/screens/add_post_screen.dart';
 import 'package:naturix/screens/chat/chat_home.dart';
 
@@ -7,6 +8,8 @@ import 'package:naturix/screens/home_page.dart';
 
 import 'package:naturix/screens/favourites.dart';
 import 'package:naturix/screens/search.dart';
+
+import '../recommendation/views/screens/recommendation_screen.dart';
 
 class BtmNavBar extends StatefulWidget {
   const BtmNavBar({super.key});
@@ -47,7 +50,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100]!,
+      backgroundColor: Colors.grey[100],
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
@@ -55,23 +58,44 @@ class _BtmNavBarState extends State<BtmNavBar> {
           HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
-          FavoritesScreen(),
+          RecommendationScreen(),
           HomePage(),
         ],
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.grey[100]!,
-        color: const Color.fromARGB(255, 1, 158, 140),
-        items: const [
-          Icon(Icons.home, color: Color.fromARGB(255, 255, 255, 255)),
-          Icon(Icons.search, color: Colors.white),
-          Icon(Icons.add_circle, color: Colors.white),
-          Icon(Icons.star, color: Colors.white),
-          Icon(Icons.chat, color: Colors.white),
-        ],
-        onTap: navigationTapped,
-        index: currentIndex,
-      ),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: navigationTapped,
+        selectedIndex: currentIndex,
+        destinations: [
+
+
+          NavigationDestination(
+
+            icon: Icon(Icons.home),
+              label: "home"
+
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.search),
+              label: "search"
+
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.add_circle),
+              label: "create"
+
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.recommend),
+              label: "recommend"
+
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.chat),
+            label: "chat"
+          ),
+        ],)
     );
   }
 }
+
+
