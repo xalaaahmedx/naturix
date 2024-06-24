@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:naturix/screens/favourites.dart';
 import 'package:naturix/screens/tips_toggle.dart';
 import 'package:naturix/widgets/grocery_list.dart';
 import 'package:naturix/screens/my_profile.dart';
@@ -119,7 +120,8 @@ class _MainDrawerState extends State<MainDrawer>
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const MyProfile()),
+                          MaterialPageRoute(
+                              builder: (context) => const MyProfile()),
                         );
                       },
                     ),
@@ -157,9 +159,15 @@ class _MainDrawerState extends State<MainDrawer>
                       },
                     ),
                     buildDrawerItem(
-                      icon: Icons.kitchen,
-                      title: 'Kitchen',
-                      onTap: () {},
+                      icon: Icons.star,
+                      title: 'Favorites',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const FavoritesScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),

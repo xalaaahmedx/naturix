@@ -67,7 +67,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreens> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BtmNavBar(),
+                        builder: (context) => const BtmNavBar(role: "",),
                       ),
                     );
                   },

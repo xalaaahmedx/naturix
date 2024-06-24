@@ -19,13 +19,16 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<UserCredential> signUpWithEmailandPassword(
-      String email, String password) async {
+      String email, String password, String role) async {
+    // Step 3: Accept role parameter
     try {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-      _firestore.collection('users').doc(userCredential.user!.uid).set({
+      // Step 4: Set role in Firestore along with other user info
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': email,
+        'role': role,
       }, SetOptions(merge: true));
 
       return userCredential;

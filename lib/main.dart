@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -55,11 +56,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider (create: (_) => RecommendationCubit()),
-        Provider (create: (_) => ShoppingListCubit()),
-
+        Provider(create: (_) => RecommendationCubit()),
+        Provider(create: (_) => ShoppingListCubit()),
       ],
-      builder: (context,widget) {
+      builder: (context, widget) {
         return MaterialApp(
           theme: theme,
           title: 'Naturix',
@@ -69,9 +69,52 @@ class MyApp extends StatelessWidget {
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.active) {
                 final User? user = snapshot.data;
-                return user != null ? const BtmNavBar() : const LoginPage();
+                if (user != null) {
+                  // User is signed in
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.email)
+                        .get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return const Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == null || !snapshot.data!.exists) {
+                          return const Text('User document does not exist');
+                        }
+
+                        Map<String, dynamic>? data =
+                            snapshot.data!.data() as Map<String, dynamic>?;
+                        if (data == null) {
+                          return const Text('No data found in user document');
+                        }
+
+                        String? userRole = data['role'];
+
+                        if (userRole == null) {
+                          // Role not found, handle accordingly
+                          return const LoginPage();
+                        }
+
+                        // Navigate based on user's role
+                        return BtmNavBar(role: userRole);
+                      }
+
+                      // By default, show loading spinner
+                      return Center(child: const CircularProgressIndicator());
+                    },
+                  );
+                } else {
+                  // User is not signed in
+                  return const LoginPage();
+                }
               } else {
-                return const CircularProgressIndicator();
+                // Initial connection state, show loading spinner
+                return Center(child: const CircularProgressIndicator());
               }
             },
           ),

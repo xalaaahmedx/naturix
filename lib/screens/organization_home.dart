@@ -11,15 +11,26 @@ import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/maindrawe.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/flashsale/flashsale.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:naturix/helper/helper_methods.dart';
 
-class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({Key? key}) : super(key: key);
+import 'package:naturix/screens/my_profile.dart';
+import 'package:naturix/widgets/posts/wallposts.dart';
+import 'package:naturix/widgets/maindrawe.dart';
+import 'package:naturix/widgets/widgetss/comment.dart';
+import 'package:naturix/widgets/widgetss/flashsale/flashsale.dart';
 
+class OrganizationHome extends StatefulWidget {
   @override
-  _HomePageScreenState createState() => _HomePageScreenState();
+  State<OrganizationHome> createState() => _OrganizationHomeState();
 }
 
-class _HomePageScreenState extends State<HomePageScreen> {
+class _OrganizationHomeState extends State<OrganizationHome> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   int currentIndex = 0;

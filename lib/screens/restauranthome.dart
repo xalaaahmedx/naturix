@@ -5,21 +5,20 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naturix/helper/helper_methods.dart';
-
 import 'package:naturix/screens/my_profile.dart';
 import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/maindrawe.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 import 'package:naturix/widgets/widgetss/flashsale/flashsale.dart';
 
-class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({Key? key}) : super(key: key);
+class Restauranthome extends StatefulWidget {
+  const Restauranthome({Key? key}) : super(key: key);
 
   @override
-  _HomePageScreenState createState() => _HomePageScreenState();
+  _RestauranthomeState createState() => _RestauranthomeState();
 }
 
-class _HomePageScreenState extends State<HomePageScreen> {
+class _RestauranthomeState extends State<Restauranthome> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   int currentIndex = 0;

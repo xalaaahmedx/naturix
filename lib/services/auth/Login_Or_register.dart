@@ -1,6 +1,6 @@
 
 
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:naturix/screens/login_page.dart';
 import 'package:naturix/screens/register.dart';
 
@@ -28,4 +28,4 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
       return Register(onTap: togglePages);
     }
   }
-}
+}*/

@@ -102,7 +102,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                const BtmNavBar()), // Replace HomePage with your home page widget
+                const BtmNavBar(role: "",)), // Replace HomePage with your home page widget
       );
     } catch (e) {
       print('Error uploading post: $e');

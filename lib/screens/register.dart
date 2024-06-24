@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/screens/home_page.dart';
+import 'package:naturix/screens/organization_home.dart';
+import 'package:naturix/screens/restauranthome.dart';
 
 import 'package:provider/provider.dart';
 import 'package:naturix/screens/login_page.dart';
@@ -21,6 +24,7 @@ class _RegisterState extends State<Register> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final emailTextController = TextEditingController();
+  String _selectedRole = 'User';
 
   @override
   void dispose() {
@@ -51,16 +55,36 @@ class _RegisterState extends State<Register> {
       // Extract username from email
       String username = userCredential.user!.email!.split('@')[0];
 
-      FirebaseFirestore.instance
+      // Set user role in Firestore
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.email)
           .set({
         'username': username,
         'bio': 'Empty bio...',
+        'role': _selectedRole,
       }, SetOptions(merge: true));
 
-      // Signup successful, navigate back to login page
-      Navigator.pop(context);
+      // Navigate to respective home page based on role
+      switch (_selectedRole) {
+        case 'User':
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          break;
+        case 'Organization':
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          break;
+        case 'Restaurant':
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => Restauranthome()));
+          break;
+        default:
+          // Navigate to a default home page if role not recognized
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          break;
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -69,6 +93,8 @@ class _RegisterState extends State<Register> {
           ),
         ),
       );
+
+      // Handle specific errors or display a generic message
     }
   }
 
@@ -127,9 +153,36 @@ class _RegisterState extends State<Register> {
                   const SizedBox(
                     height: 25,
                   ),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Select Role',
+                      border: OutlineInputBorder(),
+                    ),
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ),
+                    value:
+                        _selectedRole, // You need to define this variable in your state class
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedRole = newValue!;
+                      });
+                    },
+                    items: <String>['User', 'Organization', 'Restaurant']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
                   MyButtons(
                     text: 'SignUp',
-                    onTap: _signUp,
+                    onTap: () =>
+                        _signUp(), // Update this to pass the selected role
                   ),
                   const SizedBox(
                     height: 20,
