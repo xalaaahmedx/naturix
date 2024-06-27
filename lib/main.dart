@@ -6,10 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:naturix/firebase_options.dart';
 import 'package:naturix/recommendation/views/blocs/recommendation_cubit.dart';
 import 'package:naturix/recommendation/views/blocs/shopping_list/shopping_list_cubit.dart';
+import 'package:naturix/screens/first_onboardingscreen.dart';
 import 'package:naturix/screens/login_page.dart';
+import 'package:naturix/screens/splash.dart';
 import 'package:naturix/services/auth/auth_sarvice.dart';
 
 import 'package:naturix/widgets/btm_nav_bar.dart';
+
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -111,7 +114,7 @@ class MyApp extends StatelessWidget {
                       },
                     );
                   } else {
-                    return const LoginPage();
+                    return const SplashScreen();
                   }
                 } else {
                   return const Center(child: CircularProgressIndicator());

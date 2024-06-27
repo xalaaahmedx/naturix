@@ -3,8 +3,7 @@ import 'package:naturix/intro_screens/intro_page_2.dart';
 import 'package:naturix/intro_screens/intro_page_3.dart';
 import 'package:naturix/intro_screens/intro_page_4.dart';
 import 'package:naturix/intro_screens/intropage_1.dart';
-
-import 'package:naturix/widgets/btm_nav_bar.dart';
+import 'package:naturix/screens/login_page.dart';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -17,14 +16,13 @@ class OnBoardingScreens extends StatefulWidget {
 
 class _OnBoardingScreenState extends State<OnBoardingScreens> {
   final _controller = PageController();
+  bool onLastPage = false;
 
   @override
   void dispose() {
     super.dispose();
     _controller.dispose();
   }
-
-  bool onLastPage = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +43,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreens> {
               IntroPage4(),
             ],
           ),
-          Container(
-            alignment: const Alignment(0, 0.8),
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -61,13 +61,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreens> {
                     spacing: 5,
                   ),
                 ),
-                const SizedBox(width: 200),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BtmNavBar(role: "",),
+                        builder: (context) => const LoginPage(),
                       ),
                     );
                   },
