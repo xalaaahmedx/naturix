@@ -22,7 +22,11 @@ class ProfileHeaderWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  @override
   Widget build(BuildContext context) {
+    // Default profile image URL
+    const defaultImageUrl = 'assets/images/bear.png';
+
     return Container(
       padding: EdgeInsets.all(16.sp), // Use sizer method for padding
       decoration: BoxDecoration(
@@ -65,7 +69,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                     backgroundColor: Colors.white,
                     backgroundImage: userData['profileImageUrl'] != null
                         ? Image.network(userData['profileImageUrl']!).image
-                        : AssetImage('assets/images/bear.png'),
+                        : AssetImage(defaultImageUrl),
                   ),
                 ),
                 Positioned(

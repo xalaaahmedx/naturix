@@ -28,6 +28,29 @@ class FirebaseService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> searchOrganizationUsers() async {
+    try {
+      QuerySnapshot userDocs =
+          await users.where('role', isEqualTo: 'Organization').get();
+
+      if (userDocs.docs.isNotEmpty) {
+        List<Map<String, dynamic>> results = userDocs.docs
+            .map((doc) => {
+                  'email': doc['email'],
+                  'username': doc['username'],
+                  'profileImageUrl': doc['profileImageUrl'],
+                })
+            .toList();
+        return results;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error searching organization users: $e');
+      return [];
+    }
+  }
+
   Future<String?> getUserData(String userId) async {
     try {
       DocumentSnapshot userDoc = await users.doc(userId).get();
@@ -40,5 +63,4 @@ class FirebaseService {
       return null;
     }
   }
-  
 }

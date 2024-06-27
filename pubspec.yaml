@@ -75,6 +75,8 @@ dependencies:
   video_player:
   flick_video_player: ^0.8.0
   dio:
+  animate_do: ^3.3.4
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
@@ -105,6 +107,7 @@ flutter:
     - assets/images/Compost-cycle.gif
     - assets/images/Delivery-pana.png
     - assets/images/MotherEarth.png
+    - assets/images/Resala.png
     - images/
     - assets/images/background.jpg
     - assets/images/girl.jpg

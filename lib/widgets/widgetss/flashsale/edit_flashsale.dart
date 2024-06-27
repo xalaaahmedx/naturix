@@ -75,6 +75,15 @@ class _EditFlashSaleScreenState extends State<EditFlashSaleScreen> {
     Navigator.pop(context);
   }
 
+  Future<void> _deleteFlashSale() async {
+    await FirebaseFirestore.instance
+        .collection('flashSales')
+        .doc(widget.flashSaleId)
+        .delete();
+
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +159,18 @@ class _EditFlashSaleScreenState extends State<EditFlashSaleScreen> {
               ElevatedButton(
                 onPressed: _updateFlashSale,
                 child: Text('Update Flash Sale'),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _deleteFlashSale,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.red, // Set the background color to red
+                ),
+                child: Text(
+                  'Delete Flash Sale',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

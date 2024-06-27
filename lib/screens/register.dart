@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/screens/organization_home.dart';
-import 'package:naturix/screens/restauranthome.dart';
 
 import 'package:provider/provider.dart';
 import 'package:naturix/screens/login_page.dart';
@@ -25,6 +24,7 @@ class _RegisterState extends State<Register> {
   final _confirmPasswordController = TextEditingController();
   final emailTextController = TextEditingController();
   String _selectedRole = 'User';
+  
 
   @override
   void dispose() {
@@ -54,13 +54,17 @@ class _RegisterState extends State<Register> {
 
       // Extract username from email
       String username = userCredential.user!.email!.split('@')[0];
+      final defaultImageUrl = 'assets/images/bear.png';
 
       // Set user role in Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.email)
           .set({
+            'profileImageUrl': defaultImageUrl,
+        'uid': userCredential.user!.uid,
         'username': username,
+        'email': userCredential.user!.email,
         'bio': 'Empty bio...',
         'role': _selectedRole,
       }, SetOptions(merge: true));
@@ -77,7 +81,7 @@ class _RegisterState extends State<Register> {
           break;
         case 'Restaurant':
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Restauranthome()));
+              MaterialPageRoute(builder: (context) => HomePageScreen()));
           break;
         default:
           // Navigate to a default home page if role not recognized
@@ -101,7 +105,7 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -110,12 +114,9 @@ class _RegisterState extends State<Register> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  const Icon(
-                    Icons.message,
-                    size: 100,
+                  Image.asset(
+                    'assets/images/signup.png', // Make sure to add the image in your assets folder
+                    height: 200,
                   ),
                   const SizedBox(
                     height: 50,
@@ -185,7 +186,7 @@ class _RegisterState extends State<Register> {
                         _signUp(), // Update this to pass the selected role
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

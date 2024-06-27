@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -39,16 +39,11 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    height: 50,
+                  Image.asset(
+                    'assets/images/Charity-bro.png', // Make sure to add the image in your assets folder
+                    height: 200,
                   ),
-                  const Icon(
-                    Icons.message,
-                    size: 100,
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  const SizedBox(height: 50),
                   const Text(
                     'Welcome back!',
                     style: TextStyle(
@@ -69,9 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                   MyTextField(
                       controller: _passwordController,
                       obscureText: true,
-                      hintText: 'Enter Password'
-                     
-                      ),
+                      hintText: 'Enter Password'),
                   const SizedBox(
                     height: 25,
                   ),

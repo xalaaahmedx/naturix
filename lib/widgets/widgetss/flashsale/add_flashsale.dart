@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:sizer/sizer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddFlashSaleScreen extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _AddFlashSaleScreenState extends State<AddFlashSaleScreen> {
   final TextEditingController _priceController = TextEditingController();
   XFile? _pickedImage;
   final ImagePicker _imagePicker = ImagePicker();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _pickImage() async {
     final pickedImage =
@@ -26,6 +28,7 @@ class _AddFlashSaleScreenState extends State<AddFlashSaleScreen> {
 
   Future<void> _uploadFlashSale() async {
     if (_pickedImage != null) {
+      final currentUser = _auth.currentUser!;
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('flash_sales/${DateTime.now().millisecondsSinceEpoch}');
@@ -36,6 +39,7 @@ class _AddFlashSaleScreenState extends State<AddFlashSaleScreen> {
         'description': _descriptionController.text,
         'price': _priceController.text,
         'imageUrl': downloadUrl,
+        'useremail': currentUser.email, // Add user's email to the document
       });
 
       Navigator.pop(context);

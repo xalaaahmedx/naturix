@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:naturix/screens/user_profile_screen.dart';
 import 'package:naturix/widgets/widgetss/flashsale/add_flashsale.dart';
 import 'package:naturix/widgets/widgetss/flashsale/edit_flashsale.dart';
 
@@ -11,6 +13,7 @@ class FlashSaleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser!;
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,19 +82,18 @@ class FlashSaleWidget extends StatelessWidget {
                       final flashSale = snapshot.data!.docs[index].data()
                           as Map<String, dynamic>;
                       return GestureDetector(
-                        onTap: isRestaurantUser
-                            ? () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditFlashSaleScreen(
-                                      flashSaleId:
-                                          snapshot.data!.docs[index].id,
-                                    ),
-                                  ),
-                                );
-                              }
-                            : null,
+                        onTap: () {
+                          // Navigate to user profile page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserProfile(
+                                useremail: flashSale['useremail'] ?? '',
+                                currentUserEmail: currentUser.email!,
+                              ),
+                            ),
+                          );
+                        },
                         child: Container(
                           width: 300,
                           margin: EdgeInsets.symmetric(horizontal: 8),
@@ -100,48 +102,77 @@ class FlashSaleWidget extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(12)),
-                                    child: Image.network(
-                                      flashSale['imageUrl'] ?? '',
-                                      width: 300,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          flashSale['description'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                            child: Stack(
+                              children: [
+                                SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(12)),
+                                        child: Image.network(
+                                          flashSale['imageUrl'] ?? '',
+                                          width: 300,
+                                          height: 120,
+                                          fit: BoxFit.cover,
                                         ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          'Price: ${flashSale['price']}',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              flashSale['description'] ?? '',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              'Price: ${flashSale['price']}',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: IconButton(
+                                    onPressed: isRestaurantUser
+                                        ? () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditFlashSaleScreen(
+                                                  flashSaleId: snapshot
+                                                      .data!.docs[index].id,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        : null,
+                                    icon: Icon(Icons.edit),
+                                    tooltip: 'Edit Flash Sale',
+                                    color: const Color.fromARGB(
+                                        255, 255, 255, 255),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

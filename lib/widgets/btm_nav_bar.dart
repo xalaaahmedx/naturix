@@ -3,7 +3,7 @@ import 'package:naturix/screens/add_post_screen.dart';
 import 'package:naturix/screens/chat/chat_home.dart';
 import 'package:naturix/screens/favourites.dart';
 import 'package:naturix/screens/home_page.dart';
-import 'package:naturix/screens/restauranthome.dart';
+
 import 'package:naturix/screens/search.dart';
 import 'package:naturix/screens/organization_home.dart'; // Import necessary screens
 
@@ -94,15 +94,15 @@ class _BtmNavBarState extends State<BtmNavBar> {
         ];
       case 'Organization':
         return [
-          OrganizationHome(), // Example screen for Organization role
+          HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
-          FavoritesScreen(),
+          RecommendationScreen(),
           HomePage(),
         ];
       case 'Restaurant':
         return [
-          Restauranthome(), // Example screen for Restaurant role
+          HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
           RecommendationScreen(),
@@ -110,7 +110,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
         ];
       default:
         return [
-          HomePageScreen(), // Default screens
+          HomePageScreen(),
           SearchScreen(),
           AddPostScreen(),
           RecommendationScreen(),

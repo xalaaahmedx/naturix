@@ -38,7 +38,7 @@ class UserPosts extends StatelessWidget {
       return [];
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Expanded(

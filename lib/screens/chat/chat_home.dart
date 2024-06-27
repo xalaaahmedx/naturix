@@ -47,7 +47,11 @@ class _HomePageState extends State<HomePage> {
           return Center(child: Text('Error fetching conversations'));
         }
 
-        final conversationIds = snapshot.data!;
+        final conversationIds = snapshot.data ?? [];
+
+        if (conversationIds.isEmpty) {
+          return _buildPlaceholderScreen();
+        }
 
         return ListView.builder(
           padding: EdgeInsets.all(4.w),
@@ -57,6 +61,30 @@ class _HomePageState extends State<HomePage> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildPlaceholderScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/bear.png', // Ensure this path is correct
+            width: 2500,
+            height: 250,
+          ),
+          SizedBox(height: 40),
+          Text(
+            'No chats available, start a new chat!',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
