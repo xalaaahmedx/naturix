@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/first_onboardingscreen.dart';
-import 'package:naturix/screens/login_page.dart'; // Replace with your desired screen to navigate after splash
-
+import 'package:naturix/screens/login_page.dart'; 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -15,10 +14,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Simulate a long-running task, such as initializing data or fetching resources
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 5), () {
       // After 3 seconds, navigate to the next screen
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => OnBoardingScreens(),
         ),

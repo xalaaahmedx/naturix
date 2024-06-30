@@ -171,7 +171,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 color: Colors.black,
               ),
             ),
-            actions: [
+            /* actions: [
               IconButton(
                 onPressed: () {},
                 icon: const Icon(
@@ -179,7 +179,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   color: Colors.black,
                 ),
               ),
-            ],
+            ],*/
           ),
           drawer: SizedBox(
             width: MediaQuery.of(context).size.width * 0.6,
@@ -203,6 +203,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   child: FlashSaleWidget(isRestaurantUser: isRestaurantUser),
                 ),
+                const SizedBox(height: 16),
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('user posts')

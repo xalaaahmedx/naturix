@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/services/chat_service/chat_service.dart';
 
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/bear.png', // Ensure this path is correct
+            'assets/images/Online Review-pana.png',
             width: 2500,
             height: 250,
           ),
@@ -89,81 +90,85 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildConversationCard(String conversationId) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 2.w),
-      child: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('conversations')
-            .doc(conversationId)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return ListTile(title: Text('Error loading conversation'));
-          }
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.symmetric(vertical: 2.w),
+        child: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('conversations')
+              .doc(conversationId)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return ListTile(title: Text('Error loading conversation'));
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return ListTile(title: Text('Loading...'));
-          }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return ListTile(title: Text('Loading...'));
+            }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-          final participants = data['participants'] as List;
-          final lastMessage = data['lastMessage'] as String;
+            final data = snapshot.data!.data() as Map<String, dynamic>;
+            final participants = data['participants'] as List;
+            final lastMessage = data['lastMessage'] as String;
 
-          final otherParticipantEmail = participants
-              .firstWhere((email) => email != _auth.currentUser!.email);
+            final otherParticipantEmail = participants
+                .firstWhere((email) => email != _auth.currentUser!.email);
 
-          return FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance
-                .collection('users')
-                .doc(otherParticipantEmail)
-                .get(),
-            builder: (context, userSnapshot) {
-              if (userSnapshot.hasError ||
-                  !userSnapshot.hasData ||
-                  userSnapshot.data == null) {
-                return ListTile(title: Text('Error loading user data'));
-              }
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(otherParticipantEmail)
+                  .get(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.hasError ||
+                    !userSnapshot.hasData ||
+                    userSnapshot.data == null) {
+                  return ListTile(title: Text('Error loading user data'));
+                }
 
-              final userData =
-                  userSnapshot.data!.data() as Map<String, dynamic>;
-              final profileImageUrl = userData['profileImageUrl'] as String?;
-              final username = userData['username'] as String;
+                final userData =
+                    userSnapshot.data!.data() as Map<String, dynamic>;
+                final profileImageUrl = userData['profileImageUrl'] as String?;
+                final username = userData['username'] as String;
 
-              return ListTile(
-                title: Text(
-                  username,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.sp,
-                  ),
-                ),
-                subtitle: Text(
-                  lastMessage,
-                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
-                ),
-                leading: CircleAvatar(
-                  radius: 10.w,
-                  backgroundImage: profileImageUrl != null
-                      ? NetworkImage(profileImageUrl) as ImageProvider<Object>?
-                      : AssetImage('assets/default_image.png')
-                          as ImageProvider<Object>?,
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatPage(
-                        recieverUserId: otherParticipantEmail,
-                        userEmail: _auth.currentUser!.email!,
-                      ),
+                return ListTile(
+                  title: Text(
+                    username,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
                     ),
-                  );
-                },
-              );
-            },
-          );
-        },
+                  ),
+                  subtitle: Text(
+                    lastMessage,
+                    style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                  ),
+                  leading: CircleAvatar(
+                    radius: 30.w,
+                    backgroundImage: profileImageUrl != null
+                        ? NetworkImage(profileImageUrl)
+                            as ImageProvider<Object>?
+                        : AssetImage('assets/default_image.png')
+                            as ImageProvider<Object>?,
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(
+                          recieverUserId: otherParticipantEmail,
+                          userEmail: _auth.currentUser!.email!,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

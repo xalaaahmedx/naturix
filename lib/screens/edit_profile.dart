@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> fields;
@@ -37,12 +37,12 @@ class _EditProfileState extends State<EditProfile> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
-            fontSize: 16.sp, // Responsive font size
+            fontSize: 18.sp, // Responsive font size
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.save, color: Colors.black, size: 6.w),
+            icon: Icon(Icons.save, color: Colors.black, size: 24.w),
             onPressed: () {
               Map<String, dynamic> updatedValues = {};
 
@@ -56,13 +56,13 @@ class _EditProfileState extends State<EditProfile> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(5.w), // Responsive padding
-        child: Column(
+        padding: EdgeInsets.all(20.w), // Responsive padding
+        child: ListView(
           children: [
             for (var entry in widget.fields.entries)
               if (entry.key.toLowerCase() != 'image')
                 Padding(
-                  padding: EdgeInsets.only(bottom: 4.w), // Responsive padding
+                  padding: EdgeInsets.only(bottom: 20.w), // Responsive padding
                   child: TextField(
                     controller: _textControllers[entry.key],
                     maxLines: entry.key.toLowerCase() == 'password' ? 1 : null,
@@ -70,21 +70,29 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: InputDecoration(
                       labelText: 'Enter new ${entry.key}',
                       labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 1, 158, 140),
-                        fontSize: 12.sp, // Responsive font size
+                        color: Colors.teal,
+                        fontSize: 14.sp, // Responsive font size
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color.fromARGB(255, 1, 158, 140),
-                          width: 0.4.w, // Responsive border width
+                          color: Colors.teal,
+                          width: 1.w, // Responsive border width
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.grey,
-                          width: 0.4.w, // Responsive border width
+                          width: 1.w, // Responsive border width
                         ),
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(10.w), // Rounded corners
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 14.h,
+                        horizontal: 10.w,
+                      ), // Padding inside the text field
                     ),
                   ),
                 ),

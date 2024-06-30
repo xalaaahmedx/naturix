@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:naturix/screens/home_page.dart';
 import 'package:naturix/screens/organization_home.dart';
+import 'package:naturix/widgets/btm_nav_bar.dart';
 
 import 'package:provider/provider.dart';
 import 'package:naturix/screens/login_page.dart';
@@ -24,7 +25,6 @@ class _RegisterState extends State<Register> {
   final _confirmPasswordController = TextEditingController();
   final emailTextController = TextEditingController();
   String _selectedRole = 'User';
-  
 
   @override
   void dispose() {
@@ -61,7 +61,7 @@ class _RegisterState extends State<Register> {
           .collection('users')
           .doc(userCredential.user!.email)
           .set({
-            'profileImageUrl': defaultImageUrl,
+        'profileImageUrl': defaultImageUrl,
         'uid': userCredential.user!.uid,
         'username': username,
         'email': userCredential.user!.email,
@@ -72,21 +72,37 @@ class _RegisterState extends State<Register> {
       // Navigate to respective home page based on role
       switch (_selectedRole) {
         case 'User':
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BtmNavBar(
+                        role: _selectedRole,
+                      )));
           break;
         case 'Organization':
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BtmNavBar(
+                        role: _selectedRole,
+                      )));
           break;
         case 'Restaurant':
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BtmNavBar(
+                        role: _selectedRole,
+                      )));
           break;
         default:
           // Navigate to a default home page if role not recognized
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePageScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BtmNavBar(
+                        role: _selectedRole,
+                      )));
           break;
       }
     } catch (e) {

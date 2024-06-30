@@ -8,7 +8,8 @@ class Comments extends StatelessWidget {
   final String? imageUrl;
   final String? username; // Add this line
 
-  const Comments({super.key, 
+  const Comments({
+    super.key,
     required this.userProfileImageUrl,
     required this.text,
     required this.user,
@@ -24,10 +25,6 @@ class Comments extends StatelessWidget {
       children: [
         Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(userProfileImageUrl),
-              radius: 16,
-            ),
             const SizedBox(width: 8),
             Text(
               username ??

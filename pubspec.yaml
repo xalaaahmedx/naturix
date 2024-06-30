@@ -77,6 +77,7 @@ dependencies:
   dio:
   animate_do: ^3.3.4
   flutter_screenutil: ^5.9.3
+  youtube_player_flutter: ^9.0.1
 
 dev_dependencies:
   flutter_test:
@@ -117,6 +118,7 @@ flutter:
     - assets/icons/other.png
     - assets/images/earth.png
     - assets/images/tips22.jpg
+    - assets/images/Love potion-rafiki.png
     
 
   #   - images/a_dot_ham.jpeg

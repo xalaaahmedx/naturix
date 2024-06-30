@@ -59,8 +59,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favorites'),
@@ -80,121 +78,134 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           }
 
           if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No favorite posts'));
+            return Center(
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/images/Love potion-rafiki.png',
+                    height: 400,
+                    width: 400,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No favorites yet',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
           return Padding(
-              padding:
-                  EdgeInsets.all(screenSize.width * 0.05), // Responsive padding
-              child: ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  final post =
-                      snapshot.data!.docs[index].data() as Map<String, dynamic>;
-                  final imageUrl = post['ImageUrl'] as String? ?? '';
+            padding: EdgeInsets.all(16.0), // Adjust as needed
+            child: ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                final post =
+                    snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                final imageUrl = post['ImageUrl'] as String? ?? '';
 
-                  if (post['UserEmail'] == currentUser.email) {
-                    return Container(); // Skip rendering this post
-                  }
+                if (post['UserEmail'] == currentUser.email) {
+                  return Container(); // Skip rendering this post
+                }
 
-                  return FutureBuilder(
-                    future: FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(post['UserEmail'])
-                        .get(),
-                    builder: (context, userSnapshot) {
-                      if (userSnapshot.connectionState ==
-                              ConnectionState.waiting ||
-                          !userSnapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color.fromARGB(255, 1, 158, 140),
-                            ),
+                return FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(post['UserEmail'])
+                      .get(),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.connectionState ==
+                            ConnectionState.waiting ||
+                        !userSnapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color.fromARGB(255, 1, 158, 140),
                           ),
-                        );
-                      }
+                        ),
+                      );
+                    }
 
-                      final userData =
-                          userSnapshot.data!.data() as Map<String, dynamic>;
-                      return FutureBuilder(
-                        future: FirebaseFirestore.instance
-                            .collection('user posts')
-                            .doc(snapshot.data!.docs[index].id)
-                            .collection('Comments')
-                            .orderBy('CommentTime', descending: true)
-                            .get(),
-                        builder: (context, commentSnapshot) {
-                          if (commentSnapshot.connectionState ==
-                                  ConnectionState.waiting ||
-                              !commentSnapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                // Modernizing the circular progress indicator
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color.fromARGB(255, 1, 158, 140),
-                                ),
-                              ),
-                            );
-                          }
-
-                          final comments =
-                              commentSnapshot.data!.docs.map<Comments>((doc) {
-                            final commentData = doc.data();
-                            return Comments(
-                              userProfileImageUrl:
-                                  userData['profileImageUrl'] as String? ?? '',
-                              text: commentData['CommentText'],
-                              user: commentData['CommentedBy'],
-                              time: formatData(commentData['CommentTime']),
-                              imageUrl: null,
-                            );
-                          }).toList();
-
-                          return Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  12), // Responsive radius
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenSize.width *
-                                    0.05, // Responsive horizontal padding
-                                vertical: screenSize.height *
-                                    0.02, // Responsive vertical padding
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  WallPost(
-                                    userProfileImageUrl:
-                                        userData['profileImageUrl']
-                                                as String? ??
-                                            '',
-                                    messages: post['Message'],
-                                    user: post['UserEmail'],
-                                    postId: snapshot.data!.docs[index].id??'',
-                                    likes:
-                                        List<String>.from(post['Likes'] ?? []),
-                                    time: formatData(post['TimeStamp']),
-                                    imageUrl: imageUrl,
-                                    commentsFuture: fetchComments(
-                                        snapshot.data!.docs[index].id??""),
-                                  ),
-                                  SizedBox(
-                                      height: screenSize.height *
-                                          0.02), // Responsive spacing
-                                ],
+                    final userData =
+                        userSnapshot.data!.data() as Map<String, dynamic>;
+                    return FutureBuilder(
+                      future: FirebaseFirestore.instance
+                          .collection('user posts')
+                          .doc(snapshot.data!.docs[index].id)
+                          .collection('Comments')
+                          .orderBy('CommentTime', descending: true)
+                          .get(),
+                      builder: (context, commentSnapshot) {
+                        if (commentSnapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            !commentSnapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              // Modernizing the circular progress indicator
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color.fromARGB(255, 1, 158, 140),
                               ),
                             ),
                           );
-                        },
-                      );
-                    },
-                  );
-                },
-              ));
+                        }
+
+                        final comments =
+                            commentSnapshot.data!.docs.map<Comments>((doc) {
+                          final commentData = doc.data();
+                          return Comments(
+                            userProfileImageUrl:
+                                userData['profileImageUrl'] as String? ?? '',
+                            text: commentData['CommentText'],
+                            user: commentData['CommentedBy'],
+                            time: formatData(commentData['CommentTime']),
+                            imageUrl: null,
+                          );
+                        }).toList();
+
+                        return Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 12.0,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                WallPost(
+                                  userProfileImageUrl:
+                                      userData['profileImageUrl'] as String? ??
+                                          '',
+                                  messages: post['Message'],
+                                  user: post['UserEmail'],
+                                  postId: snapshot.data!.docs[index].id ?? '',
+                                  likes: List<String>.from(post['Likes'] ?? []),
+                                  time: formatData(post['TimeStamp']),
+                                  imageUrl: imageUrl,
+                                  commentsFuture: fetchComments(
+                                      snapshot.data!.docs[index].id ?? ""),
+                                ),
+                                SizedBox(
+                                  height: 12.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          );
         },
       ),
     );

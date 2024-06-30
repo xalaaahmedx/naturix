@@ -141,7 +141,12 @@ class _MyProfileState extends State<MyProfile> {
             .update(updatedValues);
 
         setState(() {
-          // Update local state based on the updatedValues
+          if (updatedValues.containsKey('username')) {
+            userData['username'] = updatedValues['username'];
+          }
+          if (updatedValues.containsKey('bio')) {
+            userData['bio'] = updatedValues['bio'];
+          }
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -234,8 +239,8 @@ class _MyProfileState extends State<MyProfile> {
 
         // Update the local state based on the new image URL
         setState(() {
-          // Assuming you want to update only the profileImageUrl
-          followersCount = followersCount;
+          userData['profileImageUrl'] = imageUrl;
+            followersCount = followersCount;
           followingCount = followingCount;
           postsCount = postsCount;
         });
@@ -292,8 +297,8 @@ class _MyProfileState extends State<MyProfile> {
             icon: const Icon(Icons.edit, color: Colors.black),
             onPressed: () {
               _editField({
-                'username': '',
-                'bio': '',
+                'username': userData['username'],
+                'bio': userData['bio'],
               });
             },
           ),
@@ -325,8 +330,8 @@ class _MyProfileState extends State<MyProfile> {
                         postsCount: postsCount,
                         onEditProfile: () {
                           _editField({
-                            'username': '',
-                            'bio': '',
+                            'username': userData['username'],
+                            'bio': userData['bio'],
                           });
                         },
                         onChangeProfilePicture: _changeProfilePicture,

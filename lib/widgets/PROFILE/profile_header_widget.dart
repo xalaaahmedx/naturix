@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart'; // Import sizer package
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+ // Import sizer package
 import 'package:naturix/screens/followers.dart';
 import 'package:naturix/screens/following_screen.dart';
 
-class ProfileHeaderWidget extends StatelessWidget {
+class ProfileHeaderWidget extends StatefulWidget {
   final Map<String, dynamic> userData;
   final int followersCount;
   final int followingCount;
@@ -22,6 +23,11 @@ class ProfileHeaderWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ProfileHeaderWidget> createState() => _ProfileHeaderWidgetState();
+}
+
+class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
+ 
   @override
   Widget build(BuildContext context) {
     // Default profile image URL
@@ -42,7 +48,7 @@ class ProfileHeaderWidget extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: onChangeProfilePicture,
+            onTap: widget.onChangeProfilePicture,
             child: Stack(
               children: [
                 Container(
@@ -67,8 +73,9 @@ class ProfileHeaderWidget extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 200.sp, // Use sizer method for radius
                     backgroundColor: Colors.white,
-                    backgroundImage: userData['profileImageUrl'] != null
-                        ? Image.network(userData['profileImageUrl']!).image
+                    backgroundImage: widget.userData['profileImageUrl'] != null
+                        ? Image.network(widget.userData['profileImageUrl']!)
+                            .image
                         : AssetImage(defaultImageUrl),
                   ),
                 ),
@@ -94,7 +101,7 @@ class ProfileHeaderWidget extends StatelessWidget {
           ),
           SizedBox(height: 16.sp), // Use sizer method for spacing
           Text(
-            userData['username'] ?? '',
+            widget.userData['username'] ?? '',
             style: TextStyle(
               fontSize: 24.sp, // Use sizer method for font size
               fontWeight: FontWeight.bold,
@@ -103,7 +110,7 @@ class ProfileHeaderWidget extends StatelessWidget {
           ),
           SizedBox(height: 8.sp), // Use sizer method for spacing
           Text(
-            userData['bio'] ?? '',
+            widget.userData['bio'] ?? '',
             style: TextStyle(
               fontSize: 16.sp, // Use sizer method for font size
               color: Colors.white,
@@ -117,7 +124,7 @@ class ProfileHeaderWidget extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    '$postsCount',
+                    '${widget.postsCount}',
                     style: TextStyle(
                       fontSize: 18.sp, // Use sizer method for font size
                       fontWeight: FontWeight.bold,
@@ -141,7 +148,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      '$followersCount',
+                      '${widget.followersCount}',
                       style: TextStyle(
                         fontSize: 18.sp, // Use sizer method for font size
                         fontWeight: FontWeight.bold,
@@ -166,7 +173,7 @@ class ProfileHeaderWidget extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      '$followingCount',
+                      '${widget.followingCount}',
                       style: TextStyle(
                         fontSize: 18.sp, // Use sizer method for font size
                         fontWeight: FontWeight.bold,

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:naturix/widgets/btm_nav_bar.dart';
 
 class AddPostScreen extends StatefulWidget {
@@ -17,31 +18,35 @@ class AddPostScreen extends StatefulWidget {
 
 class _AddPostScreenState extends State<AddPostScreen> {
   final TextEditingController _textEditingController = TextEditingController();
-  XFile? _pickedImage;
+  File? _pickedImage;
   bool _isEditing = false;
+  bool _isLoading = false;
+  String? userRole = 'User'; // Add this line
 
   @override
   void initState() {
     super.initState();
     if (widget.postId != null) {
       _isEditing = true;
-      // Fetch the existing post content if in edit mode
       fetchPostContent();
     }
   }
 
+@override
+  void dispose() {
+    // TODO: implement dispose
+    
+    super.dispose();
+    _textEditingController.dispose();
+    
+  }
   void fetchPostContent() async {
     try {
-      // Fetch the post document from Firestore
       DocumentSnapshot postSnapshot = await FirebaseFirestore.instance
           .collection('user posts')
           .doc(widget.postId)
           .get();
-
-      // Extract the post content
       String postContent = postSnapshot['Message'];
-
-      // Set the post content to the text field
       _textEditingController.text = postContent;
     } catch (e) {
       print('Error fetching post content: $e');
@@ -54,14 +59,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     if (pickedImage != null) {
       setState(() {
-        _textEditingController.clear();
-        _textEditingController.clearComposing();
-        _pickedImage = pickedImage;
+        _pickedImage = File(pickedImage.path);
       });
     }
   }
 
   Future<void> _uploadPost() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? '';
       String? downloadUrl;
@@ -71,15 +78,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
         Reference storageReference = storage
             .ref()
             .child('images/${DateTime.now().millisecondsSinceEpoch}');
-        File imageFile = File(_pickedImage!.path);
-        UploadTask uploadTask = storageReference.putFile(imageFile);
+        UploadTask uploadTask = storageReference.putFile(_pickedImage!);
         await uploadTask.whenComplete(() => null);
-
         downloadUrl = await storageReference.getDownloadURL();
       }
 
       if (_isEditing) {
-        // Update existing post if in edit mode
         await FirebaseFirestore.instance
             .collection('user posts')
             .doc(widget.postId)
@@ -88,7 +92,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
           'ImageUrl': downloadUrl,
         });
       } else {
-        // Add new post if not in edit mode
         await FirebaseFirestore.instance.collection('user posts').add({
           'UserEmail': currentUserEmail,
           'Message': _textEditingController.text,
@@ -106,6 +109,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
       );
     } catch (e) {
       print('Error uploading post: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -115,27 +122,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Post' : 'Create Post'),
+        title: Text('Create Post'),
       ),
       body: GestureDetector(
         onTap: _dismissKeyboard,
-        child: Container(
-          padding: EdgeInsets.all(screenSize.width * 0.04),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(screenSize.width * 0.04),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: screenSize.width * 0.01,
-                spreadRadius: screenSize.width * 0.002,
-              ),
-            ],
-          ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -143,91 +137,73 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 controller: _textEditingController,
                 decoration: InputDecoration(
                   hintText: 'What\'s on your mind?',
-                  border: InputBorder.none,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.w),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
                 ),
                 maxLines: null,
               ),
-              SizedBox(height: screenSize.width * 0.04),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _pickImage,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(screenSize.width * 0.03),
-                            bottomRight:
-                                Radius.circular(screenSize.width * 0.03),
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.photo),
-                          SizedBox(width: screenSize.width * 0.02),
-                          Text(
-                            'Add Photo',
-                            style: TextStyle(
-                              fontSize: screenSize.width * 0.04,
-                              color: Color.fromARGB(255, 1, 158, 140),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+              SizedBox(height: 16.h),
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  height: 400.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12.w),
                   ),
-                  SizedBox(width: screenSize.width * 0.04),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _uploadPost,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 1, 158, 140),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(screenSize.width * 0.03),
-                            bottomRight:
-                                Radius.circular(screenSize.width * 0.03),
+                  child: _pickedImage == null
+                      ? Center(
+                          child: Icon(
+                            Icons.add_photo_alternate,
+                            size: 60.w,
+                            color: Colors.grey,
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(12.w),
+                          child: Image.file(
+                            _pickedImage!,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                      child: Row(
+                ),
+              ),
+              SizedBox(height: 16.h),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _uploadPost,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 1, 158, 140),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.w),
+                  ),
+                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.edit),
-                          SizedBox(width: screenSize.width * 0.02),
+                          SizedBox(width: 8.w),
                           Text(
                             _isEditing ? 'Update Post' : 'Create Post',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: screenSize.width * 0.04,
+                              fontSize: 16.sp,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
               ),
-              if (_pickedImage != null)
-                Container(
-                  margin: EdgeInsets.only(top: screenSize.width * 0.04),
-                  height: screenSize.width * 0.6,
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(screenSize.width * 0.03),
-                    image: DecorationImage(
-                      image: FileImage(File(_pickedImage!.path)),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
       ),
+      resizeToAvoidBottomInset: true,
     );
   }
 }

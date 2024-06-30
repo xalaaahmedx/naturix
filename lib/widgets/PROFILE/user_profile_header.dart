@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserProfileHeader extends StatelessWidget {
   final Map<String, dynamic> userData;
@@ -25,6 +25,8 @@ class UserProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String userRole = userData['role'] ?? ''; // Fetch user role
+
     return Container(
       padding: EdgeInsets.all(16.sp),
       decoration: const BoxDecoration(
@@ -53,13 +55,22 @@ class UserProfileHeader extends StatelessWidget {
             ),
           ),
           SizedBox(height: 5.sp),
-          Text(
-            userData['username'] ?? '',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                userData['username'] ?? '',
+                style: TextStyle(
+                  fontSize: 30.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 5),
+              if (userRole.isNotEmpty) ...[
+                _getRoleIcon(userRole),
+              ],
+            ],
           ),
           SizedBox(height: 5.sp),
           Text(
@@ -189,6 +200,34 @@ class UserProfileHeader extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _getRoleIcon(String role) {
+    String assetPath = ''; // Initialize empty asset path
+
+    switch (role.toLowerCase()) {
+      case 'restaurant':
+        assetPath = 'assets/images/restaurant (2).png';
+        break;
+      case 'organization':
+        assetPath = 'assets/images/charity (1).png';
+        break;
+      case 'user':
+        assetPath = 'assets/images/user (2).png';
+        break;
+      default:
+        assetPath = 'assets/images/user (2).png';
+        break;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 5.0),
+      child: Image.asset(
+        assetPath,
+        width: 30.sp,
+        height: 30.sp,
       ),
     );
   }

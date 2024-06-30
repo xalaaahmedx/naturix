@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart'; // Import sizer package
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:naturix/widgets/posts/wallposts.dart';
 import 'package:naturix/widgets/widgetss/comment.dart';
 
-class ProfileBodyWidget extends StatelessWidget {
+class ProfileBodyWidget extends StatefulWidget {
   final List<QueryDocumentSnapshot> userPosts;
   final Map<String, dynamic> userData;
 
@@ -15,6 +16,11 @@ class ProfileBodyWidget extends StatelessWidget {
     required this.userData,
   }) : super(key: key);
 
+  @override
+  State<ProfileBodyWidget> createState() => _ProfileBodyWidgetState();
+}
+
+class _ProfileBodyWidgetState extends State<ProfileBodyWidget> {
   Future<List<Comments>> fetchComments(String postId) async {
     try {
       final commentsSnapshot = await FirebaseFirestore.instance
@@ -47,9 +53,9 @@ class ProfileBodyWidget extends StatelessWidget {
       child: Expanded(
         // Use Expanded widget here
         child: ListView.builder(
-          itemCount: userPosts.length,
+          itemCount: widget.userPosts.length,
           itemBuilder: (context, index) {
-            final post = userPosts[index].data() as Map<String, dynamic>;
+            final post = widget.userPosts[index].data() as Map<String, dynamic>;
 
             return Card(
               margin: EdgeInsets.symmetric(
@@ -67,14 +73,14 @@ class ProfileBodyWidget extends StatelessWidget {
                         EdgeInsets.all(12.sp), // Use sizer method for padding
                     child: WallPost(
                       userProfileImageUrl:
-                          userData['profileImageUrl'] as String? ?? '',
+                          widget.userData['profileImageUrl'] as String? ?? '',
                       messages: post['Message'],
                       user: post['UserEmail'],
-                      postId: userPosts[index].id,
+                      postId: widget.userPosts[index].id,
                       likes: List<String>.from(post['Likes'] ?? []),
                       time: formatData(post['TimeStamp']),
                       imageUrl: post['ImageUrl'] as String? ?? '',
-                      commentsFuture: fetchComments(userPosts[index].id),
+                      commentsFuture: fetchComments(widget.userPosts[index].id),
                     ),
                   ),
                 ],

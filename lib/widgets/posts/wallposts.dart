@@ -5,7 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:naturix/screens/chat/chatpage.dart';
 import 'package:naturix/screens/user_profile_screen.dart';
 import 'package:naturix/widgets/posts/edit_post.dart';
-import 'package:naturix/widgets/widgetss/comment.dart';
+
+import 'package:naturix/widgets/widgetss/comment.dart'; // Fix this import
 import 'package:naturix/helper/helper_methods.dart';
 import 'package:sizer/sizer.dart';
 
@@ -40,11 +41,29 @@ class _WallPostState extends State<WallPost> {
   bool isLiked = false;
   bool showComments = false;
   final TextEditingController commentController = TextEditingController();
+  String userRole = '';
 
   @override
   void initState() {
     super.initState();
     isLiked = widget.likes.contains(currentUser.email);
+    fetchUserRole();
+  }
+
+  Future<void> fetchUserRole() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          userRole = userDoc['role']; // Set user role from Firestore
+        });
+      }
+    } catch (e) {
+      print('Error fetching user role: $e');
+    }
   }
 
   void deletePost() async {
@@ -84,6 +103,11 @@ class _WallPostState extends State<WallPost> {
                     .then((value) => print('Post Deleted'))
                     .catchError(
                         (error) => print('Failed to delete post: $error'));
+
+
+                setState(() {
+                  showComments = false;
+                });
                 Navigator.pop(context);
               },
               child: const Text('Delete'),
@@ -220,13 +244,22 @@ class _WallPostState extends State<WallPost> {
                                       as Map<String, dynamic>;
                                   final username = userData['username'] ?? '';
 
-                                  return Text(
-                                    username,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.sp, // Use sp from DeviceExt
-                                    ),
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        username,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize:
+                                              18.sp, // Use sp from DeviceExt
+                                        ),
+                                      ),
+                                      SizedBox(width: 5),
+                                      if (userRole.isNotEmpty) ...[
+                                        _getRoleIcon(userRole),
+                                      ],
+                                    ],
                                   );
                                 },
                               ),
@@ -317,6 +350,7 @@ class _WallPostState extends State<WallPost> {
                                     ),
                                   ),
                                 );
+
                                 break;
                               case 'favorites':
                                 toggleFavorite();
@@ -508,6 +542,34 @@ class _WallPostState extends State<WallPost> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _getRoleIcon(String role) {
+    String assetPath = ''; // Initialize empty asset path
+
+    switch (role.toLowerCase()) {
+      case 'restaurant':
+        assetPath = 'assets/images/restaurant (1).png';
+        break;
+      case 'organization':
+        assetPath = 'assets/images/charity (1).png';
+        break;
+      case 'user':
+        assetPath = 'assets/images/user (1).png';
+        break;
+      default:
+        assetPath = 'assets/images/user (1).png';
+        break;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 5.0),
+      child: Image.asset(
+        assetPath,
+        width: 30.sp,
+        height: 30.sp,
       ),
     );
   }

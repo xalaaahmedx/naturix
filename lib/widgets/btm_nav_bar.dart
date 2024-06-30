@@ -131,7 +131,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
           BottomNavigationBarItem(
               icon: Icon(Icons.add_circle), label: 'Create'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.recommend), label: 'Recommend'),
+              icon: Icon(Icons.lightbulb_outline), label: 'Recommend'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ];
       case 'Organization':
@@ -141,7 +141,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
           BottomNavigationBarItem(
               icon: Icon(Icons.add_circle), label: 'Create'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.recommend), label: 'Recommend'),
+              icon: Icon(Icons.lightbulb_outline), label: 'Recommend'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ];
       case 'Restaurant':
@@ -151,7 +151,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
           BottomNavigationBarItem(
               icon: Icon(Icons.add_circle), label: 'Create'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.recommend), label: 'Recommend'),
+              icon: Icon(Icons.lightbulb_outline), label: 'Recommend'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ];
       default:
@@ -161,7 +161,7 @@ class _BtmNavBarState extends State<BtmNavBar> {
           BottomNavigationBarItem(
               icon: Icon(Icons.add_circle), label: 'Create'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.recommend), label: 'Recommend'),
+              icon: Icon(Icons.lightbulb_outline), label: 'Recommend'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ];
     }
